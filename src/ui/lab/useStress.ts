@@ -33,7 +33,7 @@ export function useStress() {
         done = mc.step(192);
         if (seq.current !== id) return; // superseded
         setProgress(mc.progress);
-        setResult({ dists: mc.results(), runsDone: Math.round(mc.progress * (runs + 1)), total: runs + 1 });
+        setResult({ dists: mc.results(), runsDone: mc.runsDone, total: runs + 1 });
         await new Promise((r) => setTimeout(r, 0)); // yield to the UI
       }
     } catch (e) {

@@ -20,7 +20,11 @@ export function normal(rand: () => number): number {
   return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * rand());
 }
 
-/** Multiplicative forecast noise: price * (1 + sigma * z). Timestamps preserved. */
+/**
+ * Multiplicative forecast noise: price * (1 + sigma * z). Timestamps preserved.
+ * Unbiased in expectation; at large sigma a draw can flip a price's sign,
+ * which is accepted by the spec as an extreme-forecast-miss case.
+ */
 export function perturbDam(dam: PricePoint[], sigma: number, rand: () => number): PricePoint[] {
   if (sigma === 0) return dam.map((p) => ({ ...p }));
   return dam.map((p) => ({ t: p.t, price: p.price * (1 + sigma * normal(rand)) }));
@@ -82,6 +86,11 @@ export class MonteCarlo {
 
   get totalRuns(): number {
     return this.opts.runs + 1;
+  }
+
+  /** Completed runs (baseline included). */
+  get runsDone(): number {
+    return this.runIdx;
   }
 
   get progress(): number {
