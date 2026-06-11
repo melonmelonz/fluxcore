@@ -4,7 +4,11 @@ export interface WearStats {
   /** equivalent full cycles: MWh discharged / fleet capacity in MWh */
   cycles: number;
   mwhDischarged: number;
-  /** accrued degradation cost in dollars */
+  /**
+   * Accrued degradation cost in dollars (mwhDischarged x rate).
+   * This is the wear component already embedded in P&L - shown standalone
+   * so the hidden cost of cycling the batteries is visible.
+   */
   degradationDollars: number;
 }
 

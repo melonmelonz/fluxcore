@@ -62,4 +62,9 @@ describe('WearPanel', () => {
     expect(screen.getAllByText(/4.25 cycles/)).toHaveLength(2);
     expect(screen.getAllByText(/\$229.50/)).toHaveLength(2);
   });
+
+  it('falls back to dashes when wear is absent', () => {
+    render(<WearPanel snap={snap} />);
+    expect(screen.getAllByText('-').length).toBeGreaterThan(0);
+  });
 });
