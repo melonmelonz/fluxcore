@@ -1,4 +1,7 @@
-import type { PricePoint } from './types';
+import { Backtest } from './backtest';
+import type { Fleet } from './fleet';
+import type { Strategy } from './strategy';
+import type { PricePoint, Scenario } from './types';
 
 export function mulberry32(seed: number): () => number {
   let a = seed >>> 0;
@@ -43,4 +46,76 @@ export function histogram(values: number[], bins: number): HistBin[] {
     ({ x0: min + i * w, x1: min + (i + 1) * w, count: 0 }));
   for (const v of values) out[Math.min(bins - 1, Math.floor((v - min) / w))].count += 1;
   return out;
+}
+
+export interface MonteCarloOptions {
+  /** perturbed runs in addition to the unperturbed baseline (run 0) */
+  runs: number;
+  sigma: number;
+  seed: number;
+  /** fresh strategy instances per run (strategies may hold state) */
+  strategyFactory: () => Strategy[];
+}
+
+export interface StrategyDistribution {
+  name: string;
+  /** index 0 = unperturbed baseline */
+  pnls: number[];
+  stats: DistStats;
+  bins: HistBin[];
+}
+
+export class MonteCarlo {
+  private readonly rand: () => number;
+  private runIdx = 0;
+  private current: Backtest | null = null;
+  private names: string[] = [];
+  private readonly collected: number[][] = [];
+
+  constructor(
+    private readonly scenario: Scenario,
+    private readonly fleetFactory: () => Fleet,
+    private readonly opts: MonteCarloOptions,
+  ) {
+    this.rand = mulberry32(opts.seed);
+  }
+
+  get totalRuns(): number {
+    return this.opts.runs + 1;
+  }
+
+  get progress(): number {
+    const inner = this.current?.progress ?? 0;
+    return Math.min(1, (this.runIdx + inner) / this.totalRuns);
+  }
+
+  /** Step up to n engine ticks; true when every run is complete. */
+  step(n: number): boolean {
+    if (this.runIdx >= this.totalRuns) return true;
+    if (!this.current) {
+      const dam = this.runIdx === 0
+        ? this.scenario.dam
+        : perturbDam(this.scenario.dam, this.opts.sigma, this.rand);
+      this.current = new Backtest({ ...this.scenario, dam }, this.fleetFactory, this.opts.strategyFactory());
+    }
+    if (this.current.step(n)) {
+      const results = this.current.results();
+      if (this.runIdx === 0) {
+        this.names = results.map((r) => r.name);
+        results.forEach(() => this.collected.push([]));
+      }
+      results.forEach((r, i) => this.collected[i].push(r.pnl));
+      this.current = null;
+      this.runIdx += 1;
+    }
+    return this.runIdx >= this.totalRuns;
+  }
+
+  /** Distributions over completed runs (callable mid-flight for streaming UI). */
+  results(): StrategyDistribution[] {
+    return this.names.map((name, i) => {
+      const pnls = this.collected[i];
+      return { name, pnls, stats: summarize(pnls), bins: histogram(pnls, 12) };
+    });
+  }
 }
