@@ -1,0 +1,23 @@
+name = "fluxcore-desk"
+main = "src/index.ts"
+compatibility_date = "2026-06-01"
+compatibility_flags = ["nodejs_compat"]
+
+[triggers]
+crons = ["*/5 * * * *"]
+
+[[kv_namespaces]]
+binding = "FLUX_KV"
+id = "61fa92a81af6402787e5b2661f727730"
+
+[[d1_databases]]
+binding = "FLUX_DB"
+database_name = "fluxcore"
+database_id = "f7924b52-8e3f-4a1a-8daf-5db09a30638c"
+
+[durable_objects]
+bindings = [{ name = "LIVE_DESK", class_name = "LiveDesk" }]
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["LiveDesk"]
