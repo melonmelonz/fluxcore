@@ -72,6 +72,15 @@ Rate-limited per-IP on the POST routes.
   last KV cache with its `lastUpdated` stamp; the UI shows a quiet "stale"
   badge. The desk simply skips a tick. The demo can never hard-fail on a
   feed hiccup.
+- **Permanent capture — the self-growing archive:** every scraped point is
+  write-through persisted to D1 (`price_points(hub, market, t, price)`,
+  PK `(hub, market, t)` so re-scrapes dedupe for free; ~300 rows/day/hub).
+  A nightly compaction job exports each finished day from D1 into the same
+  monthly chunk format the backtest lab reads (served via
+  `/api/archive/{hub}/{YYYY-MM}` for months newer than the shipped static
+  files). Net effect: every day the desk runs live becomes backtestable
+  history automatically, and no fetched data is ever lost or re-fetched.
+  D1 free tier holds decades at this volume.
 
 ## 4. Features by phase
 
@@ -81,6 +90,8 @@ Rate-limited per-IP on the POST routes.
   PricePoint[], hub-filtered. TDD against fixture.
 - Cron (`*/5 * * * *`): refresh RTM cache; daily cron for DAM.
 - KV cache layout: `prices:{hub}:rtm` (rolling 7d), `prices:{hub}:dam`.
+- D1 write-through capture of every scraped point (Section 3) from day one,
+  so the archive starts growing the moment the cron first fires.
 - `LiveDesk` DO with alarm loop; engine consumed from packages/core unchanged
   — a `LiveClock` adapter appends arriving points instead of stepping a fixed
   array; strategies and fleets are reused as-is.
@@ -130,6 +141,36 @@ Rate-limited per-IP on the POST routes.
 - Multi-ISO: CAISO, PJM hubs via the same local-ingest path; live scraping
   per-ISO added incrementally.
 - Scheduled email digests of desk performance (MailChannels).
+
+### Phase F — the cool stuff (idea bank, build opportunistically)
+
+- **P&L heatmap calendar** — GitHub-contributions-style grid of daily desk
+  P&L per strategy; instantly shows which days the grid paid.
+- **Regret chart** — cumulative "oracle gap" over time: dollars left on the
+  table vs perfect hindsight, per strategy. The single most honest metric.
+- **LP explainability** — click any LP dispatch to see the plan it came from:
+  the 24h DAM forecast it believed vs what RT actually did. Makes "why did it
+  do that" answerable, and makes the heat-wave story visual.
+- **Market events timeline** — annotated historical moments (Winter Storm
+  Uri 2021, Aug 2023 heat wave, Heather 2024) as one-click backtest presets
+  with a sentence of context. Doubles as onboarding.
+- **Storm mode** — when live RT crosses a spike threshold the UI quietly
+  shifts: orange price line, pulsing LIVE badge. Pure CSS drama.
+- **Time machine scrub** — replay any past live-desk day from the captured
+  archive (free byproduct of the self-growing archive).
+- **Strategy duel links** — a URL encodes two configs + a window; opening it
+  runs the duel client-side and shows a winner card. Shareable trash talk.
+- **Monte Carlo stress** — perturb DAM forecasts with noise, run N backtests,
+  show P&L distribution instead of a single number; reveals strategy
+  fragility honestly.
+- **Battery wear dashboard** — cumulative cycles and accrued degradation
+  dollars per fleet; the hidden cost made visible.
+- **Data export** — one-click CSV/JSON of any ledger, backtest result, or
+  price window. Cheap to build, makes the tool feel professional.
+- **Embeddable live widget** — a tiny iframe-able card of live desk P&L
+  (needs a relaxed frame-ancestors variant on one route only).
+- **PWA install** — manifest + service worker caching the archive; backtests
+  work fully offline.
 
 ### Polish (woven through A–C)
 
