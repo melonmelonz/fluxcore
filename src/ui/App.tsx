@@ -54,19 +54,19 @@ export default function App() {
   }, [scenarioId]);
 
   const deskActive = view === 'desk' && !isLive;
+  const { setPlaying, setSpeed } = sim;
   useEffect(() => {
     if (!deskActive) return;
     const onKey = (e: KeyboardEvent) => {
       const action = hotkeyAction(e);
       if (!action) return;
       e.preventDefault(); // space must not scroll the page
-      if (action.type === 'toggle') sim.setPlaying(!sim.playing);
-      else sim.setSpeed(action.speed);
+      if (action.type === 'toggle') setPlaying((p) => !p);
+      else setSpeed(action.speed);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deskActive, sim.playing, sim.setPlaying, sim.setSpeed]);
+  }, [deskActive, setPlaying, setSpeed]);
 
   if (error) return <main className="app"><div className="card">{error}</div></main>;
 
