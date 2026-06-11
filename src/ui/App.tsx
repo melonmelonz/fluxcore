@@ -83,13 +83,36 @@ export default function App() {
       {view === 'lab' ? (
         <LabView initial={initialLab} mix={mix} onMix={updateMix} />
       ) : isLive ? (
-        <LiveView live={live} />
+        <LiveView live={live} controls={
+          <ControlBar
+            scenarios={[LIVE_ENTRY, ...index]}
+            scenarioId={scenarioId}
+            onScenario={setScenarioId}
+            playing={sim.playing}
+            onPlay={() => sim.setPlaying(!sim.playing)}
+            speed={sim.speed}
+            onSpeed={sim.setSpeed}
+            onReset={sim.reset}
+            live={isLive}
+          />
+        } />
       ) : (
         <>
           <div className="card span-2">
             <h2>{scenario?.name ?? 'loading'} - ERCOT HB_NORTH - $/MWh{' '}<StormBadge storm={storm} /></h2>
             <PriceChart snap={sim.snap} epoch={sim.epoch} storm={storm} />
           </div>
+          <ControlBar
+            scenarios={[LIVE_ENTRY, ...index]}
+            scenarioId={scenarioId}
+            onScenario={setScenarioId}
+            playing={sim.playing}
+            onPlay={() => sim.setPlaying(!sim.playing)}
+            speed={sim.speed}
+            onSpeed={sim.setSpeed}
+            onReset={sim.reset}
+            live={isLive}
+          />
           <PnlStrip snap={sim.snap} />
           <FleetPanel snap={sim.snap} />
           <WearPanel snap={sim.snap} />
@@ -104,19 +127,6 @@ export default function App() {
             <DecisionLog snap={sim.snap} />
           </div>
         </>
-      )}
-      {view === 'desk' && (
-        <ControlBar
-          scenarios={[LIVE_ENTRY, ...index]}
-          scenarioId={scenarioId}
-          onScenario={setScenarioId}
-          playing={sim.playing}
-          onPlay={() => sim.setPlaying(!sim.playing)}
-          speed={sim.speed}
-          onSpeed={sim.setSpeed}
-          onReset={sim.reset}
-          live={isLive}
-        />
       )}
     </main>
   );
