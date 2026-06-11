@@ -197,3 +197,11 @@ header.brand span { color: var(--dim); font-size: 12px; }
 .wear-grid .delta { font-size: 12px; color: var(--dim); }
 
 .export-btn { float: right; margin-left: 6px; background: var(--surface-2); color: var(--text); border: 1px solid var(--line); border-radius: 5px; padding: 2px 10px; font-size: 11px; font-family: var(--sans); cursor: pointer; text-transform: none; letter-spacing: 0; }
+
+.designer-presets { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.designer-presets button { background: var(--surface-2); color: var(--text); border: 1px solid var(--line); border-radius: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer; }
+.designer-presets button[aria-pressed='true'] { background: var(--blue-soft); border-color: var(--blue); }
+.designer-units { display: grid; gap: 6px; }
+.designer-units label { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--dim); }
+.designer-units input { width: 72px; background: var(--surface-2); color: var(--text); border: 1px solid var(--line); border-radius: 5px; padding: 4px 8px; font-family: var(--mono); }
+.designer-totals { margin-top: 10px; font-family: var(--mono); font-size: 12px; color: var(--cyan); }
