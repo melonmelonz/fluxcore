@@ -12,3 +12,10 @@ export function solarOutputKW(peakKW: number, hourOfDay: number, season: Season)
   if (hourOfDay < rise || hourOfDay >= set) return 0;
   return peakKW * Math.sin((Math.PI * (hourOfDay - rise)) / (set - rise));
 }
+
+/** Map a calendar month (1-12) to the solar season used by the engine. */
+export function seasonForMonth(month: number): Season {
+  if (month >= 6 && month <= 9) return 'summer';
+  if (month === 12 || month <= 2) return 'winter';
+  return 'shoulder';
+}

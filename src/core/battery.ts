@@ -36,6 +36,10 @@ export class Battery {
     return { storedKWh: stored, drawnKWh: drawn };
   }
 
+  restore(kwh: number): void {
+    this.socKWh = Math.max(0, Math.min(kwh, this.spec.capacityKWh));
+  }
+
   discharge(kW: number, minutes: number): { deliveredKWh: number } {
     const hours = minutes / 60;
     const delivered = Math.min(Math.max(0, Math.min(kW, this.spec.maxDischargeKW)) * hours, this.socKWh);

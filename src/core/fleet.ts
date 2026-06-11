@@ -70,6 +70,15 @@ export class Fleet {
     return { deliveredKWh: delivered };
   }
 
+  /** Per-battery SoC snapshot, restorable via restore(). */
+  state(): number[] {
+    return this.homes.map((h) => h.battery.soc);
+  }
+
+  restore(state: number[]): void {
+    this.homes.forEach((h, i) => h.battery.restore(state[i] ?? 0));
+  }
+
   view(): FleetView {
     const first = this.homes[0].battery.spec;
     let soc = 0;

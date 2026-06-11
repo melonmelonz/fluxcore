@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { solarOutputKW } from '../solar';
+import { seasonForMonth, solarOutputKW } from '../solar';
 
 describe('solarOutputKW', () => {
   it('is zero at night', () => {
@@ -18,5 +18,16 @@ describe('solarOutputKW', () => {
   it('has a shorter window in winter (08:00-18:00)', () => {
     expect(solarOutputKW(5, 7, 'winter')).toBe(0);
     expect(solarOutputKW(5, 13, 'winter')).toBeCloseTo(5);
+  });
+});
+
+describe('seasonForMonth', () => {
+  it('maps months to seasons', () => {
+    expect(seasonForMonth(7)).toBe('summer'); // July
+    expect(seasonForMonth(9)).toBe('summer'); // Sept (ERCOT heat runs long)
+    expect(seasonForMonth(1)).toBe('winter');
+    expect(seasonForMonth(12)).toBe('winter');
+    expect(seasonForMonth(4)).toBe('shoulder');
+    expect(seasonForMonth(10)).toBe('shoulder');
   });
 });

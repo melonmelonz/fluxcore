@@ -64,4 +64,14 @@ describe('Fleet', () => {
     const f = Fleet.uniform(2, HOME, 'summer');
     expect(f.applySolar(0, 60)).toBe(0);
   });
+
+  it('serializes and restores per-battery state', () => {
+    const a = Fleet.uniform(3, HOME, 'summer');
+    a.charge(15, 60);
+    const state = a.state();
+    const b = Fleet.uniform(3, HOME, 'summer');
+    b.restore(state);
+    expect(b.view().socKWh).toBeCloseTo(a.view().socKWh, 9);
+    expect(b.state()).toEqual(state);
+  });
 });
