@@ -12,15 +12,15 @@ export default function PriceChart({ snap, epoch }: { snap: SimSnapshot | null; 
     if (!host.current) return;
     const c = createChart(host.current, {
       autoSize: true,
-      layout: { background: { color: 'transparent' }, textColor: '#8B98A8', fontSize: 11 },
-      grid: { vertLines: { color: '#1F2A36' }, horzLines: { color: '#1F2A36' } },
-      rightPriceScale: { borderColor: '#2C3947' },
-      timeScale: { borderColor: '#2C3947', timeVisible: true, secondsVisible: false },
+      layout: { background: { color: 'transparent' }, textColor: '#7E93AC', fontSize: 11 },
+      grid: { vertLines: { color: '#16263B' }, horzLines: { color: '#16263B' } },
+      rightPriceScale: { borderColor: '#243A55' },
+      timeScale: { borderColor: '#243A55', timeVisible: true, secondsVisible: false },
     });
     const s = c.addAreaSeries({
-      lineColor: '#5B8DC9',
-      topColor: 'rgba(91, 141, 201, 0.25)',
-      bottomColor: 'rgba(91, 141, 201, 0.02)',
+      lineColor: '#2E86E0',
+      topColor: 'rgba(46, 134, 224, 0.28)',
+      bottomColor: 'rgba(46, 134, 224, 0.02)',
       lineWidth: 2,
       priceFormat: { type: 'price', precision: 2, minMove: 0.01 },
     });
@@ -40,8 +40,8 @@ export default function PriceChart({ snap, epoch }: { snap: SimSnapshot | null; 
       markers.current = [
         ...markers.current.slice(-199),
         last.action === 'charge'
-          ? { time, position: 'belowBar' as const, color: '#5B8DC9', shape: 'arrowUp' as const }
-          : { time, position: 'aboveBar' as const, color: '#3FB68B', shape: 'arrowDown' as const },
+          ? { time, position: 'belowBar' as const, color: '#4FC3F7', shape: 'arrowUp' as const }
+          : { time, position: 'aboveBar' as const, color: '#2EBD85', shape: 'arrowDown' as const },
       ];
       series.current.setMarkers(markers.current);
     }
