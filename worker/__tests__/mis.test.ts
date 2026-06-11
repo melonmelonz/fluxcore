@@ -15,6 +15,19 @@ describe('latestDocId', () => {
   it('throws on malformed doc lists', () => {
     expect(() => latestDocId({})).toThrow();
   });
+  it('skips xml variants and returns the newest csv DocID', () => {
+    // ERCOT interleaves _csv and _xml variants newest-first; sometimes xml leads.
+    const list = {
+      ListDocsByRptTypeRes: {
+        DocumentList: [
+          { Document: { DocID: '111', FriendlyName: 'SPPHLZNP6905_20260611_1345_xml' } },
+          { Document: { DocID: '222', FriendlyName: 'SPPHLZNP6905_20260611_1345_csv' } },
+          { Document: { DocID: '333', FriendlyName: 'SPPHLZNP6905_20260611_1330_csv' } },
+        ],
+      },
+    };
+    expect(latestDocId(list)).toBe('222');
+  });
 });
 
 describe('unzipCsv', () => {

@@ -1,0 +1,30 @@
+
+ RUN  v4.1.8 /var/home/bazzite/dev/fluxcore
+
+ ❯ worker/__tests__/mis.test.ts (9 tests | 1 failed) 50ms
+     × skips xml variants and returns the newest csv DocID 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  worker/__tests__/mis.test.ts > latestDocId > skips xml variants and returns the newest csv DocID
+AssertionError: expected '111' to be '222' // Object.is equality
+
+Expected: "222"
+Received: "111"
+
+ ❯ worker/__tests__/mis.test.ts:29:31
+     27|       },
+     28|     };
+     29|     expect(latestDocId(list)).toBe('222');
+       |                               ^
+     30|   });
+     31| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 8 passed (9)
+   Start at  15:22:43
+   Duration  640ms (transform 25ms, setup 0ms, import 41ms, tests 50ms, environment 404ms)
+

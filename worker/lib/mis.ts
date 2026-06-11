@@ -5,9 +5,14 @@ const HOUR_MS = 3_600_000;
 const CENTRAL_OFFSET_MS = 6 * HOUR_MS; // fixed UTC-6, DST ignored (matches engine)
 
 export function latestDocId(docList: unknown): string {
-  const docs = (docList as { ListDocsByRptTypeRes?: { DocumentList?: { Document?: { DocID?: unknown } }[] } })
-    ?.ListDocsByRptTypeRes?.DocumentList;
-  const id = docs?.[0]?.Document?.DocID;
+  const docs = (docList as {
+    ListDocsByRptTypeRes?: { DocumentList?: { Document?: { DocID?: unknown; FriendlyName?: unknown } }[] };
+  })?.ListDocsByRptTypeRes?.DocumentList;
+  // ERCOT interleaves _csv and _xml variants newest-first; pick the newest csv.
+  const newest =
+    docs?.find((d) => typeof d?.Document?.FriendlyName === 'string' && d.Document.FriendlyName.endsWith('_csv')) ??
+    docs?.[0];
+  const id = newest?.Document?.DocID;
   if (typeof id !== 'string' && typeof id !== 'number') throw new Error('malformed MIS doc list');
   return String(id);
 }
