@@ -3,6 +3,7 @@ import type { FleetMix } from '../../core/units';
 import FleetDesigner from '../components/FleetDesigner';
 import { download, labRunCSV } from '../export';
 import { encodeLab, type LabParams } from './share';
+import StressCard from './StressCard';
 import { useLab } from './useLab';
 
 const usd = (n: number) =>
@@ -49,43 +50,46 @@ export default function LabView({ initial, mix, onMix }: { initial: LabParams | 
         {lab.error && <p className="lab-error">{lab.error}</p>}
       </div>
       {lab.run && (
-        <div className="card span-2">
-          <h2>
-            Results — {lab.run.params.hub} {lab.run.params.start} → {lab.run.params.end}
-            <span className="lab-points">{lab.run.points.toLocaleString()} intervals</span>
-            <button className="export-btn" onClick={() =>
-              download(`fluxcore-lab-${lab.run!.params.hub}-${lab.run!.params.start}-${lab.run!.params.end}.csv`, labRunCSV(lab.run!))}>
-              CSV
-            </button>
-            <button className="export-btn" onClick={() =>
-              download(`fluxcore-lab-${lab.run!.params.hub}-${lab.run!.params.start}-${lab.run!.params.end}.json`,
-                JSON.stringify(lab.run, null, 2), 'application/json')}>
-              JSON
-            </button>
-          </h2>
-          <table className="lab-table">
-            <thead>
-              <tr><th>strategy</th><th>P&amp;L</th><th>% of oracle</th><th>MWh out</th><th>dispatches</th><th>left on table</th></tr>
-            </thead>
-            <tbody>
-              {lab.run.results.map((r) => (
-                <tr key={r.name}>
-                  <td>{r.name}</td>
-                  <td className={r.pnl >= 0 ? 'pos' : 'neg'}>{usd(r.pnl)}</td>
-                  <td>{lab.run!.oracle > 0 ? `${((r.pnl / lab.run!.oracle) * 100).toFixed(1)}%` : '—'}</td>
-                  <td>{r.mwhDischarged.toFixed(1)}</td>
-                  <td>{r.dispatches}</td>
-                  <td className="neg">{usd(lab.run!.oracle - r.pnl)}</td>
+        <>
+          <div className="card span-2">
+            <h2>
+              Results — {lab.run.params.hub} {lab.run.params.start} → {lab.run.params.end}
+              <span className="lab-points">{lab.run.points.toLocaleString()} intervals</span>
+              <button className="export-btn" onClick={() =>
+                download(`fluxcore-lab-${lab.run!.params.hub}-${lab.run!.params.start}-${lab.run!.params.end}.csv`, labRunCSV(lab.run!))}>
+                CSV
+              </button>
+              <button className="export-btn" onClick={() =>
+                download(`fluxcore-lab-${lab.run!.params.hub}-${lab.run!.params.start}-${lab.run!.params.end}.json`,
+                  JSON.stringify(lab.run, null, 2), 'application/json')}>
+                JSON
+              </button>
+            </h2>
+            <table className="lab-table">
+              <thead>
+                <tr><th>strategy</th><th>P&amp;L</th><th>% of oracle</th><th>MWh out</th><th>dispatches</th><th>left on table</th></tr>
+              </thead>
+              <tbody>
+                {lab.run.results.map((r) => (
+                  <tr key={r.name}>
+                    <td>{r.name}</td>
+                    <td className={r.pnl >= 0 ? 'pos' : 'neg'}>{usd(r.pnl)}</td>
+                    <td>{lab.run!.oracle > 0 ? `${((r.pnl / lab.run!.oracle) * 100).toFixed(1)}%` : '—'}</td>
+                    <td>{r.mwhDischarged.toFixed(1)}</td>
+                    <td>{r.dispatches}</td>
+                    <td className="neg">{usd(lab.run!.oracle - r.pnl)}</td>
+                  </tr>
+                ))}
+                <tr className="lab-oracle">
+                  <td>oracle (perfect hindsight)</td>
+                  <td className="pos">{usd(lab.run.oracle)}</td>
+                  <td>100%</td><td>—</td><td>—</td><td>$0.00</td>
                 </tr>
-              ))}
-              <tr className="lab-oracle">
-                <td>oracle (perfect hindsight)</td>
-                <td className="pos">{usd(lab.run.oracle)}</td>
-                <td>100%</td><td>—</td><td>—</td><td>$0.00</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+              </tbody>
+            </table>
+          </div>
+          <StressCard params={lab.run.params} mix={mix} oracle={lab.run.oracle} />
+        </>
       )}
       <FleetDesigner mix={mix} onMix={onMix} />
     </>

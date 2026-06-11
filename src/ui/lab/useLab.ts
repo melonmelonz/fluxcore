@@ -17,7 +17,7 @@ export interface LabRun {
   points: number;
 }
 
-async function loadRange(params: LabParams): Promise<{ rtm: PricePoint[]; dam: PricePoint[] }> {
+export async function loadRange(params: LabParams): Promise<{ rtm: PricePoint[]; dam: PricePoint[] }> {
   const months = monthsInRange(params.start, params.end);
   const chunks = await Promise.all(months.map(async (m) => {
     const r = await fetch(`/data/archive/${params.hub}/${m}.json`);
