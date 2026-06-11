@@ -1,3 +1,4 @@
+import { fetchJsonWithChallenge } from '../lib/challenge';
 import { latestDocId, parseDamCsv, parseRtmCsv, unzipCsv } from '../lib/mis';
 import { mergePoints } from '../lib/merge';
 import type { PricePoint } from '../../src/core/types';
@@ -17,25 +18,19 @@ const DAM_KEEP_MS = 3 * 86_400_000;
 const MIS_LIST = 'https://www.ercot.com/misapp/servlets/IceDocListJsonWS?reportTypeId=';
 const MIS_DL = 'https://www.ercot.com/misdownload/servlets/mirDownload?doclookupId=';
 
-function cookiesOf(res: Response): string | undefined {
-  const all = res.headers.getSetCookie?.() ?? [];
-  if (all.length === 0) return undefined;
-  return all.map((c) => c.split(';')[0]).join('; ');
-}
+const COOKIE_KEY = 'mis:cookie';
 
-/** ERCOT sits behind Imperva, which sometimes serves an HTML cookie
- *  challenge instead of JSON. Retry once carrying the issued cookies. */
-async function fetchReport(reportTypeId: number): Promise<Uint8Array> {
-  let res = await fetch(MIS_LIST + reportTypeId);
-  let cookie = cookiesOf(res);
-  let list: unknown;
-  try {
-    list = JSON.parse(await res.text());
-  } catch {
-    res = await fetch(MIS_LIST + reportTypeId, { headers: cookie ? { cookie } : {} });
-    cookie = cookiesOf(res) ?? cookie;
-    list = JSON.parse(await res.text()); // still HTML -> throw -> fail closed, serve cache
-  }
+/** ERCOT sits behind Imperva, which serves an HTML cookie challenge instead
+ *  of JSON. Retry with an accumulating cookie jar (persisted in KV so later
+ *  crons skip the challenge entirely) and browser-like headers. */
+async function fetchReport(env: Env, reportTypeId: number): Promise<Uint8Array> {
+  const saved = (await env.FLUX_KV.get(COOKIE_KEY)) ?? undefined;
+  const { json: list, cookie } = await fetchJsonWithChallenge(
+    MIS_LIST + reportTypeId,
+    (url, init) => fetch(url, init),
+    saved,
+  );
+  if (cookie && cookie !== saved) await env.FLUX_KV.put(COOKIE_KEY, cookie);
   const docId = latestDocId(list);
   const dl = await fetch(MIS_DL + docId, { headers: cookie ? { cookie } : {} });
   return new Uint8Array(await dl.arrayBuffer());
@@ -50,7 +45,7 @@ async function persist(env: Env, hub: string, market: 'rtm' | 'dam', pts: PriceP
 }
 
 async function refresh(env: Env, market: 'rtm' | 'dam'): Promise<void> {
-  const zip = await fetchReport(market === 'rtm' ? RTM_REPORT : DAM_REPORT);
+  const zip = await fetchReport(env, market === 'rtm' ? RTM_REPORT : DAM_REPORT);
   const csv = unzipCsv(zip);
   const pts = market === 'rtm' ? parseRtmCsv(csv, HUB) : parseDamCsv(csv, HUB);
   const key = `prices:${HUB}:${market}`;
