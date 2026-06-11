@@ -5,6 +5,8 @@ import type { Season } from './types';
 export interface HomeSpec {
   battery: BatterySpec;
   solarPeakKW: number;
+  /** half-open local-hour window [fromHour, toHour) when the unit is offline */
+  unavailable?: { fromHour: number; toHour: number };
 }
 
 export interface FleetView {
