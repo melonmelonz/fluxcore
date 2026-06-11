@@ -1,0 +1,33 @@
+
+ RUN  v4.1.8 /var/home/bazzite/dev/fluxcore
+
+ ❯ worker/__tests__/mis.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  worker/__tests__/mis.test.ts [ worker/__tests__/mis.test.ts ]
+Error: Failed to resolve import "../lib/mis" from "worker/__tests__/mis.test.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /var/home/bazzite/dev/fluxcore/worker/__tests__/mis.test.ts:4:64
+  2  |  import { resolve } from "node:path";
+  3  |  import { describe, expect, it } from "vitest";
+  4  |  import { latestDocId, parseDamCsv, parseRtmCsv, unzipCsv } from "../lib/mis";
+     |                                                                   ^
+  5  |  const FIX = resolve(process.cwd(), "worker/__tests__/fixtures");
+  6  |  const read = (f) => readFileSync(resolve(FIX, f));
+ ❯ TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/node.js:30602:39
+ ❯ TransformPluginContext.error node_modules/vite/dist/node/chunks/node.js:30599:14
+ ❯ normalizeUrl node_modules/vite/dist/node/chunks/node.js:27842:18
+ ❯ node_modules/vite/dist/node/chunks/node.js:27905:30
+ ❯ TransformPluginContext.transform node_modules/vite/dist/node/chunks/node.js:27873:4
+ ❯ EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/node.js:30387:14
+ ❯ loadAndTransform node_modules/vite/dist/node/chunks/node.js:24646:26
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  14:41:40
+   Duration  635ms (transform 0ms, setup 0ms, import 0ms, tests 0ms, environment 423ms)
+
