@@ -75,18 +75,7 @@ export default {
     await desk.fetch('https://desk/tick', { method: 'POST' });
   },
 
-  async fetch(req: Request): Promise<Response> {
-    const url = new URL(req.url);
-    if (url.pathname === '/probe') {
-      // temporary diagnostics: what does ERCOT MIS return to a Workers fetch?
-      const res = await fetch(MIS_LIST + RTM_REPORT);
-      const body = await res.text();
-      return Response.json({
-        status: res.status,
-        headers: Object.fromEntries(res.headers),
-        head: body.slice(0, 600),
-      });
-    }
+  async fetch(): Promise<Response> {
     return new Response('fluxcore-desk: cron + DO host', { status: 200 });
   },
 };
