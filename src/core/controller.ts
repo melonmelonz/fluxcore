@@ -42,6 +42,11 @@ export class SimulationController {
     }));
   }
 
+  /** Full per-strategy ledger entries, for export. */
+  ledgers(): { name: string; entries: LedgerEntry[] }[] {
+    return this.lanes.map((l) => ({ name: l.strategy.name, entries: l.ledger.entries }));
+  }
+
   tick(): SimSnapshot | null {
     const point = this.clock.next();
     if (!point) return null;

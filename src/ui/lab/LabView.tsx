@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { download, labRunCSV } from '../export';
 import { encodeLab, type LabParams } from './share';
 import { useLab } from './useLab';
 
@@ -50,6 +51,15 @@ export default function LabView({ initial }: { initial: LabParams | null }) {
           <h2>
             Results — {lab.run.params.hub} {lab.run.params.start} → {lab.run.params.end}
             <span className="lab-points">{lab.run.points.toLocaleString()} intervals</span>
+            <button className="export-btn" onClick={() =>
+              download(`fluxcore-lab-${lab.run!.params.hub}-${lab.run!.params.start}-${lab.run!.params.end}.csv`, labRunCSV(lab.run!))}>
+              CSV
+            </button>
+            <button className="export-btn" onClick={() =>
+              download(`fluxcore-lab-${lab.run!.params.hub}-${lab.run!.params.start}-${lab.run!.params.end}.json`,
+                JSON.stringify(lab.run, null, 2), 'application/json')}>
+              JSON
+            </button>
           </h2>
           <table className="lab-table">
             <thead>

@@ -8,6 +8,7 @@ import PnlStrip from './components/PnlStrip';
 import WearPanel from './components/WearPanel';
 import PriceChart from './components/PriceChart';
 import StormBadge from './components/StormBadge';
+import { download, ledgerCSV } from './export';
 import LabView from './lab/LabView';
 import { decodeLab } from './lab/share';
 import { LiveView } from './LiveView';
@@ -72,7 +73,12 @@ export default function App() {
           <FleetPanel snap={sim.snap} />
           <WearPanel snap={sim.snap} />
           <div className="card span-2">
-            <h2>Dispatch log</h2>
+            <h2>Dispatch log
+              <button className="export-btn"
+                onClick={() => download(`fluxcore-dispatch-${scenarioId}.csv`, ledgerCSV(sim.exportEntries()))}>
+                Export CSV
+              </button>
+            </h2>
             <DecisionLog snap={sim.snap} />
           </div>
         </>

@@ -195,3 +195,5 @@ header.brand span { color: var(--dim); font-size: 12px; }
 .wear-grid .label { color: var(--dim); font-size: 12px; }
 .wear-grid .value { font-family: var(--mono); font-size: 16px; }
 .wear-grid .delta { font-size: 12px; color: var(--dim); }
+
+.export-btn { float: right; margin-left: 6px; background: var(--surface-2); color: var(--text); border: 1px solid var(--line); border-radius: 5px; padding: 2px 10px; font-size: 11px; font-family: var(--sans); cursor: pointer; text-transform: none; letter-spacing: 0; }

@@ -62,5 +62,5 @@ export function useSimulation(scenario: Scenario | null) {
     setEpoch((e) => e + 1);
   };
 
-  return { snap, playing, setPlaying, speed, setSpeed, reset, epoch };
+  return { snap, playing, setPlaying, speed, setSpeed, reset, epoch, exportEntries: () => ctl?.ledgers().flatMap((g) => g.entries).sort((a, b) => a.t - b.t) ?? [] };
 }
