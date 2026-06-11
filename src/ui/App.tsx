@@ -28,7 +28,7 @@ export default function App() {
   const isLive = scenarioId === 'live';
   const sim = useSimulation(isLive ? null : scenario);
   const live = useLiveDesk(isLive);
-  const storm = isStorm(isLive ? live?.rtm[live.rtm.length - 1]?.price : sim.snap?.price);
+  const storm = isStorm(isLive ? live?.rtm.at(-1)?.price : sim.snap?.price);
 
   useEffect(() => {
     fetch('/data/index.json')

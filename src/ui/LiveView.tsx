@@ -100,7 +100,7 @@ function toSnapshot(live: LiveState): SimSnapshot | null {
 
 export function LiveView({ live }: { live: LiveState | null }) {
   const snap = live ? toSnapshot(live) : null;
-  const storm = isStorm(live?.rtm[live.rtm.length - 1]?.price ?? null);
+  const storm = isStorm(live?.rtm.at(-1)?.price ?? null);
   return (
     <>
       <div className="card span-2">

@@ -51,6 +51,7 @@ export default function PriceChart({ snap, epoch, storm = false }: { snap: SimSn
     series.current?.applyOptions(storm
       ? { lineColor: '#F5A623', topColor: 'rgba(245, 166, 35, 0.28)', bottomColor: 'rgba(245, 166, 35, 0.02)' }
       : { lineColor: '#2E86E0', topColor: 'rgba(46, 134, 224, 0.28)', bottomColor: 'rgba(46, 134, 224, 0.02)' });
+  // epoch in deps: chart is recreated on scenario switch, so color must be reapplied
   }, [storm, epoch]);
 
   return <div className="chart-host" ref={host} />;
