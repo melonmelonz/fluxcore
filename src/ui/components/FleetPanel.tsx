@@ -9,7 +9,7 @@ export default function FleetPanel({ snap }: { snap: SimSnapshot | null }) {
       <h2>Fleet</h2>
       <div className="fleet-grid">
         <div>
-          <div className="label">Homes online</div>
+          <div className="label">Units online</div>
           <div className="value">{fleet?.homesOnline ?? 0}</div>
         </div>
         <div>

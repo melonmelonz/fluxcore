@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { Backtest, type BacktestResult } from '../../core/backtest';
-import { Fleet } from '../../core/fleet';
 import { LPStrategy } from '../../core/lp';
 import { oraclePnl } from '../../core/oracle';
 import { seasonForMonth } from '../../core/solar';
 import { ThresholdStrategy } from '../../core/threshold';
 import type { PricePoint, Scenario } from '../../core/types';
+import { type FleetMix, fleetFromMix, mixTotals } from '../../core/units';
 import { monthsInRange, rangeMs } from './range';
 import type { LabParams } from './share';
 
@@ -16,15 +16,6 @@ export interface LabRun {
   oracle: number;
   points: number;
 }
-
-const HOME = {
-  battery: {
-    capacityKWh: 13.5, maxChargeKW: 5, maxDischargeKW: 5,
-    roundTripEfficiency: 0.86, degradationCostPerMWh: 20,
-  },
-  solarPeakKW: 5,
-};
-const HOMES = 200;
 
 async function loadRange(params: LabParams): Promise<{ rtm: PricePoint[]; dam: PricePoint[] }> {
   const months = monthsInRange(params.start, params.end);
@@ -56,7 +47,7 @@ export function useLab() {
       .catch(() => setError('failed to load archive index'));
   }, []);
 
-  async function start(params: LabParams) {
+  async function start(params: LabParams, mix: FleetMix) {
     const id = ++seq.current;
     setRunning(true);
     setError(null);
@@ -69,7 +60,7 @@ export function useLab() {
       const scenario: Scenario = {
         id: 'lab', name: 'lab', description: '', season, intervalMinutes: 15, rtm, dam,
       };
-      const bt = new Backtest(scenario, () => Fleet.uniform(HOMES, HOME, season), [
+      const bt = new Backtest(scenario, () => fleetFromMix(mix, season), [
         new ThresholdStrategy(),
         new LPStrategy(),
       ]);
@@ -78,13 +69,15 @@ export function useLab() {
         setProgress(bt.progress);
         await new Promise((r) => setTimeout(r, 0)); // yield to the UI
       }
+      const probe = fleetFromMix(mix, season).view();
+      const t = mixTotals(mix);
       const oracle = oraclePnl(rtm, {
-        capacityKWh: HOMES * HOME.battery.capacityKWh,
-        maxChargeKW: HOMES * HOME.battery.maxChargeKW,
-        maxDischargeKW: HOMES * HOME.battery.maxDischargeKW,
-        roundTripEfficiency: HOME.battery.roundTripEfficiency,
-        degradationCostPerMWh: HOME.battery.degradationCostPerMWh,
-        solarPeakKW: HOMES * HOME.solarPeakKW,
+        capacityKWh: t.capacityKWh,
+        maxChargeKW: probe.maxChargeKW,
+        maxDischargeKW: t.maxDischargeKW,
+        roundTripEfficiency: probe.roundTripEfficiency,
+        degradationCostPerMWh: probe.degradationCostPerMWh,
+        solarPeakKW: t.solarPeakKW,
       }, season, 15);
       if (seq.current !== id) return;
       setRun({ params, results: bt.results(), oracle, points: rtm.length });
