@@ -23,4 +23,12 @@ export class Ledger {
   tail(n: number): LedgerEntry[] {
     return this.entries.slice(-n);
   }
+
+  get mwhCharged(): number {
+    return this.entries.reduce((s, e) => s + (e.action === 'charge' ? e.mwh : 0), 0);
+  }
+
+  get mwhDischarged(): number {
+    return this.entries.reduce((s, e) => s + (e.action === 'discharge' ? e.mwh : 0), 0);
+  }
 }
