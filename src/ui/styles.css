@@ -43,9 +43,8 @@ header.brand {
   gap: 10px;
   padding: 4px 2px;
 }
-header.brand h1 { display: flex; align-items: center; gap: 8px; font-size: 18px; margin: 0; letter-spacing: 0.02em; color: var(--cyan); font-weight: 700; }
-header.brand h1 img { height: 30px; width: 30px; }
-header.brand h1 b { color: var(--blue); font-weight: 700; }
+header.brand h1 { display: flex; align-items: center; margin: 0; }
+header.brand h1 img { height: 44px; width: auto; }
 header.brand span { color: var(--dim); font-size: 12px; }
 
 .card {

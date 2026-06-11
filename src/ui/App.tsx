@@ -74,8 +74,7 @@ export default function App() {
     <main className={storm ? 'app storm' : 'app'}>
       <header className="brand span-2">
         <h1>
-          <img src="/brand/fluxcore-emblem.png" alt="" />
-          <span><b>flux</b>core</span>
+          <img src="/brand/fluxcore-wordmark.png" alt="fluxcore" />
         </h1>
         <span>virtual power plant arbitrage engine</span>
         <nav className="tabs">
