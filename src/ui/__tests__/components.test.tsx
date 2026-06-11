@@ -4,6 +4,7 @@ import type { SimSnapshot } from '../../core/controller';
 import DecisionLog from '../components/DecisionLog';
 import FleetPanel from '../components/FleetPanel';
 import PnlStrip from '../components/PnlStrip';
+import WearPanel from '../components/WearPanel';
 
 const snap: SimSnapshot = {
   t: 1700000000000, price: 312, progress: 0.5, done: false,
@@ -45,5 +46,25 @@ describe('DecisionLog', () => {
     render(<DecisionLog snap={snap} />);
     expect(screen.getByText(/discharge/)).toBeTruthy();
     expect(screen.getByText(/312/)).toBeTruthy();
+  });
+});
+
+describe('WearPanel', () => {
+  it('shows cycles and wear dollars per strategy', () => {
+    const withWear: SimSnapshot = {
+      ...snap,
+      lanes: snap.lanes.map((l) => ({
+        ...l,
+        wear: { cycles: 4.25, mwhDischarged: 11.475, degradationDollars: 229.5 },
+      })),
+    };
+    render(<WearPanel snap={withWear} />);
+    expect(screen.getAllByText(/4.25 cycles/)).toHaveLength(2);
+    expect(screen.getAllByText(/\$229.50/)).toHaveLength(2);
+  });
+
+  it('falls back to dashes when wear is absent', () => {
+    render(<WearPanel snap={snap} />);
+    expect(screen.getAllByText('-').length).toBeGreaterThan(0);
   });
 });

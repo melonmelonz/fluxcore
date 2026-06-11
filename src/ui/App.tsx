@@ -5,6 +5,7 @@ import ControlBar from './components/ControlBar';
 import DecisionLog from './components/DecisionLog';
 import FleetPanel from './components/FleetPanel';
 import PnlStrip from './components/PnlStrip';
+import WearPanel from './components/WearPanel';
 import PriceChart from './components/PriceChart';
 import StormBadge from './components/StormBadge';
 import LabView from './lab/LabView';
@@ -69,6 +70,7 @@ export default function App() {
           </div>
           <PnlStrip snap={sim.snap} />
           <FleetPanel snap={sim.snap} />
+          <WearPanel snap={sim.snap} />
           <div className="card span-2">
             <h2>Dispatch log</h2>
             <DecisionLog snap={sim.snap} />
