@@ -1,0 +1,32 @@
+
+ RUN  v4.1.8 /var/home/bazzite/dev/fluxcore
+
+ ❯ src/core/__tests__/oracle.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/core/__tests__/oracle.test.ts [ src/core/__tests__/oracle.test.ts ]
+Error: Failed to resolve import "../oracle" from "src/core/__tests__/oracle.test.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /var/home/bazzite/dev/fluxcore/src/core/__tests__/oracle.test.ts:2:48
+  1  |  import { describe, expect, it } from "vitest";
+  2  |  import { oraclePnl } from "../oracle";
+     |                             ^
+  3  |  const NIGHT = Date.UTC(2024, 0, 15, 6, 0);
+  4  |  const SPEC = {
+ ❯ TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/node.js:30602:39
+ ❯ TransformPluginContext.error node_modules/vite/dist/node/chunks/node.js:30599:14
+ ❯ normalizeUrl node_modules/vite/dist/node/chunks/node.js:27842:18
+ ❯ node_modules/vite/dist/node/chunks/node.js:27905:30
+ ❯ TransformPluginContext.transform node_modules/vite/dist/node/chunks/node.js:27873:4
+ ❯ EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/node.js:30387:14
+ ❯ loadAndTransform node_modules/vite/dist/node/chunks/node.js:24646:26
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  15:31:54
+   Duration  610ms (transform 0ms, setup 0ms, import 0ms, tests 0ms, environment 421ms)
+
