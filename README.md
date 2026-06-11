@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/brand/fluxcore-logo.webp" alt="fluxcore" width="360" />
+  <img src="public/brand/fluxcore-logo.png" alt="fluxcore" width="360" />
 </p>
 
 <p align="center">
