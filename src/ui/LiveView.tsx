@@ -1,5 +1,6 @@
 import { createChart, type IChartApi, type ISeriesApi, type UTCTimestamp } from 'lightweight-charts';
 import { useEffect, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import type { SimSnapshot } from '../core/controller';
 import DecisionLog from './components/DecisionLog';
 import FleetPanel from './components/FleetPanel';
@@ -98,7 +99,7 @@ function toSnapshot(live: LiveState): SimSnapshot | null {
   };
 }
 
-export function LiveView({ live }: { live: LiveState | null }) {
+export function LiveView({ live, controls }: { live: LiveState | null; controls?: ReactNode }) {
   const snap = live ? toSnapshot(live) : null;
   const storm = isStorm(live?.rtm.at(-1)?.price ?? null);
   return (
@@ -110,6 +111,7 @@ export function LiveView({ live }: { live: LiveState | null }) {
         </h2>
         <LiveChart points={live?.rtm ?? []} storm={storm} />
       </div>
+      {controls}
       <PnlStrip snap={snap} />
       <FleetPanel snap={snap} />
       <div className="card span-2">

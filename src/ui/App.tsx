@@ -17,6 +17,7 @@ import { LiveView } from './LiveView';
 import { loadMix, saveMix } from './mixStorage';
 import { isStorm } from './storm';
 import { useLiveDesk } from './useLiveDesk';
+import { hotkeyAction } from './hotkeys';
 import { useSimulation } from './useSimulation';
 
 interface IndexEntry { id: string; name: string }
@@ -52,6 +53,21 @@ export default function App() {
       .catch((e: unknown) => setError(e instanceof Error ? e.message : 'failed to load scenario'));
   }, [scenarioId]);
 
+  const deskActive = view === 'desk' && !isLive;
+  const { setPlaying, setSpeed } = sim;
+  useEffect(() => {
+    if (!deskActive) return;
+    const onKey = (e: KeyboardEvent) => {
+      const action = hotkeyAction(e);
+      if (!action) return;
+      e.preventDefault(); // space must not scroll the page
+      if (action.type === 'toggle') setPlaying((p) => !p);
+      else setSpeed(action.speed);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [deskActive, setPlaying, setSpeed]);
+
   if (error) return <main className="app"><div className="card">{error}</div></main>;
 
   return (
@@ -67,13 +83,36 @@ export default function App() {
       {view === 'lab' ? (
         <LabView initial={initialLab} mix={mix} onMix={updateMix} />
       ) : isLive ? (
-        <LiveView live={live} />
+        <LiveView live={live} controls={
+          <ControlBar
+            scenarios={[LIVE_ENTRY, ...index]}
+            scenarioId={scenarioId}
+            onScenario={setScenarioId}
+            playing={sim.playing}
+            onPlay={() => sim.setPlaying(!sim.playing)}
+            speed={sim.speed}
+            onSpeed={sim.setSpeed}
+            onReset={sim.reset}
+            live={isLive}
+          />
+        } />
       ) : (
         <>
           <div className="card span-2">
             <h2>{scenario?.name ?? 'loading'} - ERCOT HB_NORTH - $/MWh{' '}<StormBadge storm={storm} /></h2>
             <PriceChart snap={sim.snap} epoch={sim.epoch} storm={storm} />
           </div>
+          <ControlBar
+            scenarios={[LIVE_ENTRY, ...index]}
+            scenarioId={scenarioId}
+            onScenario={setScenarioId}
+            playing={sim.playing}
+            onPlay={() => sim.setPlaying(!sim.playing)}
+            speed={sim.speed}
+            onSpeed={sim.setSpeed}
+            onReset={sim.reset}
+            live={isLive}
+          />
           <PnlStrip snap={sim.snap} />
           <FleetPanel snap={sim.snap} />
           <WearPanel snap={sim.snap} />
@@ -88,19 +127,6 @@ export default function App() {
             <DecisionLog snap={sim.snap} />
           </div>
         </>
-      )}
-      {view === 'desk' && (
-        <ControlBar
-          scenarios={[LIVE_ENTRY, ...index]}
-          scenarioId={scenarioId}
-          onScenario={setScenarioId}
-          playing={sim.playing}
-          onPlay={() => sim.setPlaying(!sim.playing)}
-          speed={sim.speed}
-          onSpeed={sim.setSpeed}
-          onReset={sim.reset}
-          live={isLive}
-        />
       )}
     </main>
   );
