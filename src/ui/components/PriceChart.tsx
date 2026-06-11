@@ -2,7 +2,7 @@ import { createChart, type IChartApi, type ISeriesApi, type UTCTimestamp } from 
 import { useEffect, useRef } from 'react';
 import type { SimSnapshot } from '../../core/controller';
 
-export default function PriceChart({ snap, epoch }: { snap: SimSnapshot | null; epoch: number }) {
+export default function PriceChart({ snap, epoch, storm = false }: { snap: SimSnapshot | null; epoch: number; storm?: boolean }) {
   const host = useRef<HTMLDivElement>(null);
   const chart = useRef<IChartApi | null>(null);
   const series = useRef<ISeriesApi<'Area'> | null>(null);
@@ -46,6 +46,13 @@ export default function PriceChart({ snap, epoch }: { snap: SimSnapshot | null; 
       series.current.setMarkers(markers.current);
     }
   }, [snap]);
+
+  useEffect(() => {
+    series.current?.applyOptions(storm
+      ? { lineColor: '#F5A623', topColor: 'rgba(245, 166, 35, 0.28)', bottomColor: 'rgba(245, 166, 35, 0.02)' }
+      : { lineColor: '#2E86E0', topColor: 'rgba(46, 134, 224, 0.28)', bottomColor: 'rgba(46, 134, 224, 0.02)' });
+  // epoch in deps: chart is recreated on scenario switch, so color must be reapplied
+  }, [storm, epoch]);
 
   return <div className="chart-host" ref={host} />;
 }
