@@ -4,6 +4,8 @@ import type { SimSnapshot } from '../core/controller';
 import DecisionLog from './components/DecisionLog';
 import FleetPanel from './components/FleetPanel';
 import PnlStrip from './components/PnlStrip';
+import StormBadge from './components/StormBadge';
+import { isStorm } from './storm';
 import type { LiveState } from './useLiveDesk';
 
 const STALE_MS = 20 * 60_000;
@@ -27,7 +29,7 @@ export function LiveBadge({ lastUpdated }: { lastUpdated: number | null }) {
   return <span className="live-badge on">LIVE</span>;
 }
 
-function LiveChart({ points }: { points: { t: number; price: number }[] }) {
+function LiveChart({ points, storm }: { points: { t: number; price: number }[]; storm: boolean }) {
   const host = useRef<HTMLDivElement>(null);
   const chart = useRef<IChartApi | null>(null);
   const series = useRef<ISeriesApi<'Area'> | null>(null);
@@ -51,6 +53,12 @@ function LiveChart({ points }: { points: { t: number; price: number }[] }) {
     chart.current = c;
     return () => { c.remove(); chart.current = null; series.current = null; };
   }, []);
+
+  useEffect(() => {
+    series.current?.applyOptions(storm
+      ? { lineColor: '#F5A623', topColor: 'rgba(245, 166, 35, 0.28)', bottomColor: 'rgba(245, 166, 35, 0.02)' }
+      : { lineColor: '#2E86E0', topColor: 'rgba(46, 134, 224, 0.28)', bottomColor: 'rgba(46, 134, 224, 0.02)' });
+  }, [storm]);
 
   useEffect(() => {
     if (!series.current) return;
@@ -92,13 +100,15 @@ function toSnapshot(live: LiveState): SimSnapshot | null {
 
 export function LiveView({ live }: { live: LiveState | null }) {
   const snap = live ? toSnapshot(live) : null;
+  const storm = isStorm(live?.rtm[live.rtm.length - 1]?.price ?? null);
   return (
     <>
       <div className="card span-2">
         <h2>
           Live — ERCOT HB_NORTH — $/MWh <LiveBadge lastUpdated={live?.lastUpdated ?? null} />
+          {' '}<StormBadge storm={storm} />
         </h2>
-        <LiveChart points={live?.rtm ?? []} />
+        <LiveChart points={live?.rtm ?? []} storm={storm} />
       </div>
       <PnlStrip snap={snap} />
       <FleetPanel snap={snap} />

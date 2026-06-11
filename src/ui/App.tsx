@@ -6,9 +6,11 @@ import DecisionLog from './components/DecisionLog';
 import FleetPanel from './components/FleetPanel';
 import PnlStrip from './components/PnlStrip';
 import PriceChart from './components/PriceChart';
+import StormBadge from './components/StormBadge';
 import LabView from './lab/LabView';
 import { decodeLab } from './lab/share';
 import { LiveView } from './LiveView';
+import { isStorm } from './storm';
 import { useLiveDesk } from './useLiveDesk';
 import { useSimulation } from './useSimulation';
 
@@ -26,6 +28,7 @@ export default function App() {
   const isLive = scenarioId === 'live';
   const sim = useSimulation(isLive ? null : scenario);
   const live = useLiveDesk(isLive);
+  const storm = isStorm(isLive ? live?.rtm[live.rtm.length - 1]?.price : sim.snap?.price);
 
   useEffect(() => {
     fetch('/data/index.json')
@@ -45,7 +48,7 @@ export default function App() {
   if (error) return <main className="app"><div className="card">{error}</div></main>;
 
   return (
-    <main className="app">
+    <main className={storm ? 'app storm' : 'app'}>
       <header className="brand span-2">
         <h1><b>flux</b>core</h1>
         <span>virtual power plant arbitrage engine</span>
@@ -61,8 +64,8 @@ export default function App() {
       ) : (
         <>
           <div className="card span-2">
-            <h2>{scenario?.name ?? 'loading'} - ERCOT HB_NORTH - $/MWh</h2>
-            <PriceChart snap={sim.snap} epoch={sim.epoch} />
+            <h2>{scenario?.name ?? 'loading'} - ERCOT HB_NORTH - $/MWh{' '}<StormBadge storm={storm} /></h2>
+            <PriceChart snap={sim.snap} epoch={sim.epoch} storm={storm} />
           </div>
           <PnlStrip snap={sim.snap} />
           <FleetPanel snap={sim.snap} />

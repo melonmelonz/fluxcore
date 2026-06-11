@@ -183,3 +183,10 @@ header.brand span { color: var(--dim); font-size: 12px; }
 .lab-table tr.lab-oracle td { border-top: 2px solid var(--line); border-bottom: none; color: var(--cyan); }
 .lab-table tr.lab-oracle td.pos { color: var(--green); }
 .lab-points { float: right; color: var(--dim); text-transform: none; letter-spacing: 0; }
+
+.live-badge.storm-on { background: var(--orange); color: var(--bg); animation: pulse 1.2s infinite; }
+.app.storm .card { border-color: color-mix(in srgb, var(--orange) 35%, var(--line)); transition: border-color 400ms; }
+@media (prefers-reduced-motion: reduce) {
+  .live-badge { animation: none !important; }
+  .app.storm .card { transition: none; }
+}
