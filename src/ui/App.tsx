@@ -73,7 +73,10 @@ export default function App() {
   return (
     <main className={storm ? 'app storm' : 'app'}>
       <header className="brand span-2">
-        <h1><b>flux</b>core</h1>
+        <h1>
+          <img src="/brand/fluxcore-emblem.png" alt="" />
+          <span><b>flux</b>core</span>
+        </h1>
         <span>virtual power plant arbitrage engine</span>
         <nav className="tabs">
           <button aria-pressed={view === 'desk'} onClick={() => setView('desk')}>Desk</button>
