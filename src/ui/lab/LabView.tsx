@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
+import type { FleetMix } from '../../core/units';
+import FleetDesigner from '../components/FleetDesigner';
 import { download, labRunCSV } from '../export';
 import { encodeLab, type LabParams } from './share';
 import { useLab } from './useLab';
@@ -6,7 +8,7 @@ import { useLab } from './useLab';
 const usd = (n: number) =>
   (n < 0 ? '-$' : '$') + Math.abs(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-export default function LabView({ initial }: { initial: LabParams | null }) {
+export default function LabView({ initial, mix, onMix }: { initial: LabParams | null; mix: FleetMix; onMix: (m: FleetMix) => void }) {
   const lab = useLab();
   const [hub, setHub] = useState(initial?.hub ?? 'HB_NORTH');
   const [start, setStart] = useState(initial?.start ?? '2023-08-14');
@@ -17,9 +19,9 @@ export default function LabView({ initial }: { initial: LabParams | null }) {
   useEffect(() => {
     if (initial && index && !autoRan.current) {
       autoRan.current = true;
-      startRun(initial);
+      startRun(initial, mix);
     }
-  }, [initial, index, startRun]);
+  }, [initial, index, startRun, mix]);
 
   const months = lab.index?.months ?? [];
   const min = months.length ? `${months[0]}-01` : undefined;
@@ -39,7 +41,7 @@ export default function LabView({ initial }: { initial: LabParams | null }) {
           <input aria-label="end" type="date" value={end} min={min} max={max}
             onChange={(e) => setEnd(e.target.value)} />
           <button className="primary" disabled={lab.running || start >= end}
-            onClick={() => { window.location.hash = encodeLab(params); lab.start(params); }}>
+            onClick={() => { window.location.hash = encodeLab(params); lab.start(params, mix); }}>
             {lab.running ? `Running ${Math.round(lab.progress * 100)}%` : 'Run backtest'}
           </button>
         </div>
@@ -85,6 +87,7 @@ export default function LabView({ initial }: { initial: LabParams | null }) {
           </table>
         </div>
       )}
+      <FleetDesigner mix={mix} onMix={onMix} />
     </>
   );
 }

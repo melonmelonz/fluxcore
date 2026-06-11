@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { parseScenario } from '../core/scenario';
 import type { Scenario } from '../core/types';
+import type { FleetMix } from '../core/units';
 import ControlBar from './components/ControlBar';
 import DecisionLog from './components/DecisionLog';
+import FleetDesigner from './components/FleetDesigner';
 import FleetPanel from './components/FleetPanel';
 import PnlStrip from './components/PnlStrip';
 import WearPanel from './components/WearPanel';
@@ -12,6 +14,7 @@ import { download, ledgerCSV } from './export';
 import LabView from './lab/LabView';
 import { decodeLab } from './lab/share';
 import { LiveView } from './LiveView';
+import { loadMix, saveMix } from './mixStorage';
 import { isStorm } from './storm';
 import { useLiveDesk } from './useLiveDesk';
 import { useSimulation } from './useSimulation';
@@ -27,8 +30,10 @@ export default function App() {
   const [scenarioId, setScenarioId] = useState<string | null>(null);
   const [scenario, setScenario] = useState<Scenario | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [mix, setMix] = useState<FleetMix>(loadMix);
   const isLive = scenarioId === 'live';
-  const sim = useSimulation(isLive ? null : scenario);
+  const updateMix = (m: FleetMix) => { setMix(m); saveMix(m); };
+  const sim = useSimulation(isLive ? null : scenario, mix);
   const live = useLiveDesk(isLive);
   const storm = isStorm(isLive ? live?.rtm.at(-1)?.price : sim.snap?.price);
 
@@ -60,7 +65,7 @@ export default function App() {
         </nav>
       </header>
       {view === 'lab' ? (
-        <LabView initial={initialLab} />
+        <LabView initial={initialLab} mix={mix} onMix={updateMix} />
       ) : isLive ? (
         <LiveView live={live} />
       ) : (
@@ -72,6 +77,7 @@ export default function App() {
           <PnlStrip snap={sim.snap} />
           <FleetPanel snap={sim.snap} />
           <WearPanel snap={sim.snap} />
+          <FleetDesigner mix={mix} onMix={updateMix} />
           <div className="card span-2">
             <h2>Dispatch log
               <button className="export-btn"
