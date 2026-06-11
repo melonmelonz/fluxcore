@@ -195,3 +195,13 @@ strategies, worker, or API surface beyond the single render line in
 
 Order is a plan-phase decision; features are independent except Monte Carlo
 benefiting from Fleet Designer landing first.
+
+## 10. Addendum (added 2026-06-11, approved)
+
+### Feature 7 (small): keyboard shortcuts
+
+Desk replay view only (not live, not lab): Space toggles play/pause; 1/2/3
+select the 1/6/24 h/s speeds. Implemented as a pure `hotkeyAction(e)` mapper
+in `src/ui/hotkeys.ts` (TDD, log 37) consumed by a window keydown effect in
+`App.tsx`; suppressed while typing in form controls; space never scrolls the
+page. A desktop-only hint renders in the control bar.

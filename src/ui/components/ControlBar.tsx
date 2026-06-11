@@ -26,6 +26,7 @@ export default function ControlBar(p: Props) {
           ))}
           <div className="spacer" />
           <button onClick={p.onReset}>Reset</button>
+          <span className="hotkey-hint" aria-hidden="true">space play - 1/2/3 speed</span>
         </>
       )}
     </div>
