@@ -1,25 +1,9 @@
 
  RUN  v4.1.8 /var/home/bazzite/dev/fluxcore
 
- ❯ src/core/__tests__/data.test.ts (0 test)
 
-⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
-
- FAIL  src/core/__tests__/data.test.ts [ src/core/__tests__/data.test.ts ]
-TypeError: The URL must be of scheme file
- ❯ src/core/__tests__/data.test.ts:6:15
-      4|
-      5| const DIR = new URL('../../../public/data/', import.meta.url);
-      6| const files = readdirSync(DIR).filter((f) => f.endsWith('.json') && f …
-       |               ^
-      7|
-      8| describe('bundled scenario data', () => {
-
-⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
-
-
- Test Files  1 failed (1)
-      Tests  no tests
-   Start at  13:25:51
-   Duration  622ms (transform 22ms, setup 0ms, import 0ms, tests 0ms, environment 442ms)
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  13:26:36
+   Duration  638ms (transform 19ms, setup 0ms, import 35ms, tests 17ms, environment 437ms)
 
