@@ -52,6 +52,12 @@ describe('availability window', () => {
     expect(v.capacityKWh).toBe(0);
     expect(v.socKWh).toBe(0);
   });
+  it('an empty fleet yields a zeroed view, not a crash', () => {
+    const v = new Fleet([], 'summer').view();
+    expect(v.homesOnline).toBe(0);
+    expect(v.capacityKWh).toBe(0);
+    expect(v.roundTripEfficiency).toBeGreaterThan(0);
+  });
 });
 
 describe('capacity-weighted view', () => {

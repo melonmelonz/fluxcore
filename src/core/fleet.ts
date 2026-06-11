@@ -94,7 +94,7 @@ export class Fleet {
   }
 
   view(): FleetView {
-    const first = this.homes[0].battery.spec;
+    const first = this.homes[0]?.battery.spec;
     let online = 0, soc = 0, cap = 0, headroom = 0, cRate = 0, dRate = 0, effW = 0, degW = 0;
     for (const h of this.homes) {
       if (!this.available(h)) continue;
@@ -114,8 +114,8 @@ export class Fleet {
       chargeHeadroomKWh: headroom,
       maxChargeKW: cRate,
       maxDischargeKW: dRate,
-      roundTripEfficiency: cap > 0 ? effW / cap : first.roundTripEfficiency,
-      degradationCostPerMWh: cap > 0 ? degW / cap : first.degradationCostPerMWh,
+      roundTripEfficiency: cap > 0 ? effW / cap : first?.roundTripEfficiency ?? 0.86,
+      degradationCostPerMWh: cap > 0 ? degW / cap : first?.degradationCostPerMWh ?? 20,
       solarKWNow: this.lastSolarKW,
     };
   }
