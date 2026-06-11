@@ -131,3 +131,55 @@ header.brand span { color: var(--dim); font-size: 12px; }
 .live-badge.stale { background: var(--orange); color: var(--bg); }
 .live-badge.connecting { background: var(--surface-2); color: var(--dim); }
 @keyframes pulse { 50% { opacity: 0.6; } }
+
+.tabs { margin-left: auto; display: flex; gap: 6px; }
+.tabs button {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-family: var(--sans);
+  cursor: pointer;
+}
+.tabs button[aria-pressed='true'] { background: var(--blue-soft); border-color: var(--blue); }
+
+.lab-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.lab-form select,
+.lab-form input,
+.lab-form button {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-family: var(--sans);
+  color-scheme: dark;
+}
+.lab-form button.primary { background: var(--blue-soft); border-color: var(--blue); cursor: pointer; }
+.lab-form button:disabled { opacity: 0.5; cursor: default; }
+
+.lab-progress { height: 3px; background: var(--surface-2); border-radius: 2px; overflow: hidden; margin-top: 10px; }
+.lab-progress > div { height: 100%; background: linear-gradient(90deg, var(--blue), var(--cyan)); transition: width 120ms linear; }
+.lab-error { color: var(--red); font-size: 12px; margin: 8px 0 0; }
+
+.lab-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 13px; }
+.lab-table th {
+  text-align: right;
+  color: var(--dim);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--line);
+}
+.lab-table th:first-child, .lab-table td:first-child { text-align: left; }
+.lab-table td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+.lab-table .pos { color: var(--green); }
+.lab-table .neg { color: var(--red); }
+.lab-table tr.lab-oracle td { border-top: 2px solid var(--line); border-bottom: none; color: var(--cyan); }
+.lab-table tr.lab-oracle td.pos { color: var(--green); }
+.lab-points { float: right; color: var(--dim); text-transform: none; letter-spacing: 0; }

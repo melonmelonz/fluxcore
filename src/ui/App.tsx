@@ -6,6 +6,8 @@ import DecisionLog from './components/DecisionLog';
 import FleetPanel from './components/FleetPanel';
 import PnlStrip from './components/PnlStrip';
 import PriceChart from './components/PriceChart';
+import LabView from './lab/LabView';
+import { decodeLab } from './lab/share';
 import { LiveView } from './LiveView';
 import { useLiveDesk } from './useLiveDesk';
 import { useSimulation } from './useSimulation';
@@ -15,6 +17,8 @@ interface IndexEntry { id: string; name: string }
 const LIVE_ENTRY: IndexEntry = { id: 'live', name: 'Live — ERCOT HB_NORTH' };
 
 export default function App() {
+  const [initialLab] = useState(() => decodeLab(window.location.hash));
+  const [view, setView] = useState<'desk' | 'lab'>(initialLab ? 'lab' : 'desk');
   const [index, setIndex] = useState<IndexEntry[]>([]);
   const [scenarioId, setScenarioId] = useState<string | null>(null);
   const [scenario, setScenario] = useState<Scenario | null>(null);
@@ -45,8 +49,14 @@ export default function App() {
       <header className="brand span-2">
         <h1><b>flux</b>core</h1>
         <span>virtual power plant arbitrage engine</span>
+        <nav className="tabs">
+          <button aria-pressed={view === 'desk'} onClick={() => setView('desk')}>Desk</button>
+          <button aria-pressed={view === 'lab'} onClick={() => setView('lab')}>Lab</button>
+        </nav>
       </header>
-      {isLive ? (
+      {view === 'lab' ? (
+        <LabView initial={initialLab} />
+      ) : isLive ? (
         <LiveView live={live} />
       ) : (
         <>
@@ -62,17 +72,19 @@ export default function App() {
           </div>
         </>
       )}
-      <ControlBar
-        scenarios={[LIVE_ENTRY, ...index]}
-        scenarioId={scenarioId}
-        onScenario={setScenarioId}
-        playing={sim.playing}
-        onPlay={() => sim.setPlaying(!sim.playing)}
-        speed={sim.speed}
-        onSpeed={sim.setSpeed}
-        onReset={sim.reset}
-        live={isLive}
-      />
+      {view === 'desk' && (
+        <ControlBar
+          scenarios={[LIVE_ENTRY, ...index]}
+          scenarioId={scenarioId}
+          onScenario={setScenarioId}
+          playing={sim.playing}
+          onPlay={() => sim.setPlaying(!sim.playing)}
+          speed={sim.speed}
+          onSpeed={sim.setSpeed}
+          onReset={sim.reset}
+          live={isLive}
+        />
+      )}
     </main>
   );
 }
