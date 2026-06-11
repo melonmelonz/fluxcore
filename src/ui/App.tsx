@@ -71,6 +71,7 @@ export default function App() {
         speed={sim.speed}
         onSpeed={sim.setSpeed}
         onReset={sim.reset}
+        live={isLive}
       />
     </main>
   );

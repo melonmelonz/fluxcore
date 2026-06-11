@@ -116,6 +116,7 @@ export class LiveDesk implements DurableObject {
         pnl: l.pnl,
         socKWh: l.fleetState.reduce((a, b) => a + b, 0),
         capacityKWh: HOMES * HOME.battery.capacityKWh,
+        maxDischargeKW: HOMES * HOME.battery.maxDischargeKW,
         homesOnline: HOMES,
         recent: l.recent.slice(-25),
       })),

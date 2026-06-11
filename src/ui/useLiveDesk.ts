@@ -7,6 +7,7 @@ export interface LiveLane {
   pnl: number;
   socKWh: number;
   capacityKWh: number;
+  maxDischargeKW: number;
   homesOnline: number;
   recent: LedgerEntry[];
 }
