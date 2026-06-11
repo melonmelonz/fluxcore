@@ -125,3 +125,9 @@ header.brand span { color: var(--dim); font-size: 12px; }
   .span-2 { grid-column: 1 / -1; }
   .chart-host { height: 340px; }
 }
+
+.live-badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; margin-left: 8px; vertical-align: middle; font-weight: 700; letter-spacing: 0.08em; }
+.live-badge.on { background: var(--green); color: var(--bg); animation: pulse 2s infinite; }
+.live-badge.stale { background: var(--orange); color: var(--bg); }
+.live-badge.connecting { background: var(--surface-2); color: var(--dim); }
+@keyframes pulse { 50% { opacity: 0.6; } }

@@ -6,16 +6,22 @@ import DecisionLog from './components/DecisionLog';
 import FleetPanel from './components/FleetPanel';
 import PnlStrip from './components/PnlStrip';
 import PriceChart from './components/PriceChart';
+import { LiveView } from './LiveView';
+import { useLiveDesk } from './useLiveDesk';
 import { useSimulation } from './useSimulation';
 
 interface IndexEntry { id: string; name: string }
+
+const LIVE_ENTRY: IndexEntry = { id: 'live', name: 'Live — ERCOT HB_NORTH' };
 
 export default function App() {
   const [index, setIndex] = useState<IndexEntry[]>([]);
   const [scenarioId, setScenarioId] = useState<string | null>(null);
   const [scenario, setScenario] = useState<Scenario | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const sim = useSimulation(scenario);
+  const isLive = scenarioId === 'live';
+  const sim = useSimulation(isLive ? null : scenario);
+  const live = useLiveDesk(isLive);
 
   useEffect(() => {
     fetch('/data/index.json')
@@ -25,7 +31,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (!scenarioId) return;
+    if (!scenarioId || scenarioId === 'live') return;
     fetch(`/data/${scenarioId}.json`)
       .then((r) => r.json())
       .then((raw) => setScenario(parseScenario(raw)))
@@ -40,18 +46,24 @@ export default function App() {
         <h1><b>flux</b>core</h1>
         <span>virtual power plant arbitrage engine</span>
       </header>
-      <div className="card span-2">
-        <h2>{scenario?.name ?? 'loading'} - ERCOT HB_NORTH - $/MWh</h2>
-        <PriceChart snap={sim.snap} epoch={sim.epoch} />
-      </div>
-      <PnlStrip snap={sim.snap} />
-      <FleetPanel snap={sim.snap} />
-      <div className="card span-2">
-        <h2>Dispatch log</h2>
-        <DecisionLog snap={sim.snap} />
-      </div>
+      {isLive ? (
+        <LiveView live={live} />
+      ) : (
+        <>
+          <div className="card span-2">
+            <h2>{scenario?.name ?? 'loading'} - ERCOT HB_NORTH - $/MWh</h2>
+            <PriceChart snap={sim.snap} epoch={sim.epoch} />
+          </div>
+          <PnlStrip snap={sim.snap} />
+          <FleetPanel snap={sim.snap} />
+          <div className="card span-2">
+            <h2>Dispatch log</h2>
+            <DecisionLog snap={sim.snap} />
+          </div>
+        </>
+      )}
       <ControlBar
-        scenarios={index}
+        scenarios={[LIVE_ENTRY, ...index]}
         scenarioId={scenarioId}
         onScenario={setScenarioId}
         playing={sim.playing}

@@ -17,10 +17,28 @@ const DAM_KEEP_MS = 3 * 86_400_000;
 const MIS_LIST = 'https://www.ercot.com/misapp/servlets/IceDocListJsonWS?reportTypeId=';
 const MIS_DL = 'https://www.ercot.com/misdownload/servlets/mirDownload?doclookupId=';
 
+function cookiesOf(res: Response): string | undefined {
+  const all = res.headers.getSetCookie?.() ?? [];
+  if (all.length === 0) return undefined;
+  return all.map((c) => c.split(';')[0]).join('; ');
+}
+
+/** ERCOT sits behind Imperva, which sometimes serves an HTML cookie
+ *  challenge instead of JSON. Retry once carrying the issued cookies. */
 async function fetchReport(reportTypeId: number): Promise<Uint8Array> {
-  const list = await (await fetch(MIS_LIST + reportTypeId)).json();
+  let res = await fetch(MIS_LIST + reportTypeId);
+  let cookie = cookiesOf(res);
+  let list: unknown;
+  try {
+    list = JSON.parse(await res.text());
+  } catch {
+    res = await fetch(MIS_LIST + reportTypeId, { headers: cookie ? { cookie } : {} });
+    cookie = cookiesOf(res) ?? cookie;
+    list = JSON.parse(await res.text()); // still HTML -> throw -> fail closed, serve cache
+  }
   const docId = latestDocId(list);
-  return new Uint8Array(await (await fetch(MIS_DL + docId)).arrayBuffer());
+  const dl = await fetch(MIS_DL + docId, { headers: cookie ? { cookie } : {} });
+  return new Uint8Array(await dl.arrayBuffer());
 }
 
 async function persist(env: Env, hub: string, market: 'rtm' | 'dam', pts: PricePoint[]): Promise<void> {
@@ -57,7 +75,18 @@ export default {
     await desk.fetch('https://desk/tick', { method: 'POST' });
   },
 
-  async fetch(): Promise<Response> {
+  async fetch(req: Request): Promise<Response> {
+    const url = new URL(req.url);
+    if (url.pathname === '/probe') {
+      // temporary diagnostics: what does ERCOT MIS return to a Workers fetch?
+      const res = await fetch(MIS_LIST + RTM_REPORT);
+      const body = await res.text();
+      return Response.json({
+        status: res.status,
+        headers: Object.fromEntries(res.headers),
+        head: body.slice(0, 600),
+      });
+    }
     return new Response('fluxcore-desk: cron + DO host', { status: 200 });
   },
 };
