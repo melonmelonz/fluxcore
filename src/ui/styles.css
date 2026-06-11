@@ -95,6 +95,7 @@ header.brand span { color: var(--dim); font-size: 12px; }
   backdrop-filter: blur(6px);
   border-top: 1px solid var(--line);
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   align-items: center;
   padding: 10px 12px calc(10px + env(safe-area-inset-bottom));

@@ -1,0 +1,9 @@
+
+ RUN  v4.1.8 /var/home/bazzite/dev/fluxcore
+
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  13:32:24
+   Duration  750ms (transform 39ms, setup 0ms, import 110ms, tests 54ms, environment 446ms)
+

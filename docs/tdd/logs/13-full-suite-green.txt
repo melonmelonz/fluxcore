@@ -1,0 +1,13 @@
+
+> fluxcore@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.8 /var/home/bazzite/dev/fluxcore
+
+
+ Test Files  11 passed (11)
+      Tests  52 passed (52)
+   Start at  13:33:38
+   Duration  1.11s (transform 423ms, setup 0ms, import 738ms, tests 114ms, environment 7.67s)
+

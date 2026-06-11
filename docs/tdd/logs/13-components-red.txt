@@ -1,0 +1,106 @@
+
+ RUN  v4.1.8 /var/home/bazzite/dev/fluxcore
+
+ ❯ src/ui/__tests__/components.test.tsx (3 tests | 3 failed) 28ms
+     × shows both strategies and formats P&L as dollars 22ms
+     × shows homes online and aggregate state of charge percent 2ms
+     × renders dispatch entries 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/ui/__tests__/components.test.tsx > PnlStrip > shows both strategies and formats P&L as dollars
+TestingLibraryElementError: Unable to find an element with the text: /threshold/i. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"card"[39m
+    [36m/>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/ui/__tests__/components.test.tsx:30:19
+     28|   it('shows both strategies and formats P&L as dollars', () => {
+     29|     render(<PnlStrip snap={snap} />);
+     30|     expect(screen.getByText(/threshold/i)).toBeTruthy();
+       |                   ^
+     31|     expect(screen.getByText('$540.25')).toBeTruthy();
+     32|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/ui/__tests__/components.test.tsx > FleetPanel > shows homes online and aggregate state of charge percent
+TestingLibraryElementError: Unable to find an element with the text: 200. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"card"[39m
+    [36m/>[39m
+  [36m</div>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"card"[39m
+    [36m/>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/ui/__tests__/components.test.tsx:38:19
+     36|   it('shows homes online and aggregate state of charge percent', () =>…
+     37|     render(<FleetPanel snap={snap} />);
+     38|     expect(screen.getByText('200')).toBeTruthy();
+       |                   ^
+     39|     expect(screen.getByText(/70%/)).toBeTruthy(); // 1900 / 2700
+     40|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/ui/__tests__/components.test.tsx > DecisionLog > renders dispatch entries
+TestingLibraryElementError: Unable to find an element with the text: /discharge/. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"card"[39m
+    [36m/>[39m
+  [36m</div>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"card"[39m
+    [36m/>[39m
+  [36m</div>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"log"[39m
+    [36m/>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/ui/__tests__/components.test.tsx:46:19
+     44|   it('renders dispatch entries', () => {
+     45|     render(<DecisionLog snap={snap} />);
+     46|     expect(screen.getByText(/discharge/)).toBeTruthy();
+       |                   ^
+     47|     expect(screen.getByText(/312/)).toBeTruthy();
+     48|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed (3)
+   Start at  13:30:11
+   Duration  730ms (transform 28ms, setup 0ms, import 104ms, tests 28ms, environment 450ms)
+
