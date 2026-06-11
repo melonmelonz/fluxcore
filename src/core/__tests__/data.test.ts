@@ -13,10 +13,12 @@ describe('bundled scenario data', () => {
     expect(index).toHaveLength(3);
   });
 
-  it.each(files)('%s parses and is sorted with sane sizes', (f) => {
-    const s = parseScenario(JSON.parse(readFileSync(join(DIR, f), 'utf8')));
-    expect(s.rtm.length).toBeGreaterThanOrEqual(600);
-    expect(s.dam.length).toBeGreaterThanOrEqual(160);
-    for (let i = 1; i < s.rtm.length; i++) expect(s.rtm[i].t).toBeGreaterThan(s.rtm[i - 1].t);
-  });
+  for (const f of files) {
+    it(`${f} parses and is sorted with sane sizes`, () => {
+      const s = parseScenario(JSON.parse(readFileSync(join(DIR, f), 'utf8')));
+      expect(s.rtm.length).toBeGreaterThanOrEqual(600);
+      expect(s.dam.length).toBeGreaterThanOrEqual(160);
+      for (let i = 1; i < s.rtm.length; i++) expect(s.rtm[i].t).toBeGreaterThan(s.rtm[i - 1].t);
+    });
+  }
 });
