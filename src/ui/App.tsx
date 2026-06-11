@@ -37,7 +37,7 @@ export default function App() {
   return (
     <main className="app">
       <header className="brand span-2">
-        <h1>flux<b>core</b></h1>
+        <h1><b>flux</b>core</h1>
         <span>virtual power plant arbitrage engine</span>
       </header>
       <div className="card span-2">
