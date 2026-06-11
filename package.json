@@ -12,7 +12,8 @@
     "typecheck": "tsc -b --noEmit",
     "lint": "eslint .",
     "typecheck:worker": "tsc -p worker --noEmit",
-    "deploy:worker": "wrangler deploy -c worker/wrangler.toml"
+    "deploy:worker": "wrangler deploy -c worker/wrangler.toml",
+    "typecheck:functions": "tsc -p functions --noEmit"
   },
   "dependencies": {
     "fflate": "^0.8.3",
