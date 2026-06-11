@@ -32,6 +32,26 @@ strategies compete on the same fleet, tick for tick:
 Each strategy gets its own cloned fleet and its own P&L ledger, so the
 comparison is honest: same prices, same hardware, different brains.
 
+Beyond the replay scenarios, fluxcore is a **living grid-trading laboratory**:
+
+- **Live desk** — pick "Live — ERCOT HB_NORTH" in the scenario picker. A
+  Cloudflare Worker cron scrapes ERCOT's public MIS settlement reports every
+  5 minutes (zipped CSV, no API keys, no third-party services), caches prices
+  in KV, archives every point to D1, and a Durable Object runs both strategies
+  against persistent fleets 24/7. The UI shows the desk's real cumulative P&L,
+  live dispatch log, and a freshness badge that degrades honestly to STALE if
+  the feed hiccups. The frontend still talks only to same-origin `/api/*` —
+  the strict CSP is unchanged.
+- **Backtest lab** — the Lab tab runs both strategies at max speed over any
+  window of a bundled two-year, four-hub historical archive (2023–2024;
+  HB_NORTH, HB_HOUSTON, HB_WEST, HB_SOUTH), entirely client-side. Every run
+  is scored against a **perfect-hindsight oracle**: a 48-hour
+  receding-horizon LP that sees the actual real-time prices. Results report
+  P&L, **% of theoretical max**, and dollars left on the table. Runs are
+  shareable — all parameters live in the URL
+  (`#lab?hub=HB_NORTH&start=2024-01-14&end=2024-01-21` re-runs Winter Storm
+  Heather deterministically on load).
+
 ### Scenarios (all real data)
 
 | Scenario | Window | RT price range |
@@ -56,6 +76,15 @@ thumb-reachable:
 <p align="center">
   <img src="docs/tdd/shots/ui-mobile-heatwave.png" alt="mobile" width="320" />
 </p>
+
+**Live mode** - the desk trading the real Texas grid, autonomously, right now:
+
+![live](docs/tdd/shots/ui-live-mode.png)
+
+**Backtest lab** - the 2023 heat wave week scored against the oracle. Both
+strategies left real money on the table; the reactive baseline got closer:
+
+![lab](docs/tdd/shots/ui-lab.png)
 
 A fun, honest result: on the 2023 heat wave the simple **Threshold strategy
 beats the LP Optimizer** ($22,116 vs $17,516). The LP plans against day-ahead
@@ -233,9 +262,33 @@ renders entries.
 
 ![components green](docs/tdd/shots/13-components-green.png)
 
+### 12. The live spine and the lab (same discipline)
+
+Phase two — the live ERCOT scrape, the always-on desk, and the backtest
+lab — continued the loop. Raw red/green captures are checked in under
+[`docs/tdd/logs/`](docs/tdd/logs/):
+
+| Module | Red/green logs |
+| --- | --- |
+| MIS report parser (`worker/lib/mis.ts`) — real downloaded fixtures | `20-mis-*`, `24-csv-doclist-*` |
+| KV cache merge (`worker/lib/merge.ts`) | `21-merge-*` |
+| Shared desk tick extraction (`src/core/desk.ts`) | `22-desk-*` |
+| Live UI badge + adapters (`src/ui/LiveView.tsx`) | `23-live-*` |
+| Perfect-hindsight oracle (`src/core/oracle.ts`) | `25-oracle-*` |
+| Backtest runner (`src/core/backtest.ts`) | `26-backtest-*` |
+| Lab range + share-URL helpers (`src/ui/lab/`) | `27-lab-helpers-*` |
+
+A favorite from this phase: the oracle's "carries SoC across day boundaries"
+test failed on the first implementation (a day-chunked LP can never hold
+energy overnight — it can't see tomorrow). The red run forced the redesign to
+a 48-hour receding horizon before any UI consumed the number. And the
+backtest suite pins the invariant that matters most:
+**no strategy ever beats the oracle** on real data.
+
 ### The full suite
 
-**52 tests across 11 files**, all green, about a second of test time:
+**87 tests across 18 files**, all green, about two seconds of test time
+(the original phase-one suite was 52 tests across 11 files):
 
 ![full suite](docs/tdd/shots/99-full-suite-green.png)
 
@@ -294,12 +347,28 @@ src/
     threshold.ts    reactive rolling-band trader
     lp.ts           24h day-ahead linear-program trader
     ledger.ts       per-strategy dispatch ledger and P&L
+    desk.ts         one shared market tick: solar, decide, execute, book
     controller.ts   per-tick orchestration, immutable snapshots
+    oracle.ts       perfect-hindsight LP benchmark (48h receding horizon)
+    backtest.ts     steppable max-speed runner over deskTick
   ui/            React shell - consumes snapshots, owns no business logic
     useSimulation.ts   play/pause/speed/reset, accumulator tick loop
-    App.tsx            layout + data fetch
+    useLiveDesk.ts     30s polling of /api/prices/live + /api/desk
+    App.tsx            Desk/Lab tabs, layout + data fetch
+    LiveView.tsx       live chart, LIVE/STALE badge, desk snapshot adapter
+    lab/               LabView, useLab, range + share-URL helpers
     components/        PriceChart, PnlStrip, FleetPanel, DecisionLog, ControlBar
+worker/          fluxcore-desk Cloudflare Worker (sibling deployable)
+  lib/mis.ts        ERCOT MIS doc-list -> zip -> CSV -> PricePoint[]
+  lib/merge.ts      rolling KV cache merge (dedupe, age-trim)
+  src/index.ts      */5 cron: scrape -> KV cache -> D1 archive -> DO tick
+  src/livedesk.ts   LiveDesk Durable Object: persistent 24/7 strategy lanes
+functions/       Pages Functions: same-origin /api/* proxies (KV + DO reads)
 ```
+
+The live desk and the replay simulator execute the **same engine code**:
+`deskTick` in `src/core/desk.ts` is the single market interval for both. The
+backtest lab reuses it too — three consumers, one set of physics.
 
 The core never imports from the UI, never touches the DOM, and runs identically
 under node. The UI is a thin projection of `SimSnapshot` objects - which is
@@ -327,8 +396,16 @@ points + 168 hourly DAM points. The bundles are committed - the app needs no
 backend and no API keys at runtime.
 
 ```bash
-python3 scripts/ingest/fetch_ercot.py   # regenerate public/data/*.json
+python3 scripts/ingest/fetch_ercot.py     # regenerate public/data/*.json
+python3 scripts/ingest/build_archive.py   # regenerate public/data/archive/ (lab)
 ```
+
+The lab's archive (`public/data/archive/{hub}/{YYYY-MM}.json`, ~96 chunks)
+comes from the same annual archives, chunked monthly so the lab fetches only
+the months a backtest window needs. The live desk needs neither script: it
+scrapes ERCOT's MIS reports directly, and every scraped point is
+write-through archived to D1 — every day the desk runs live becomes
+backtestable history automatically.
 
 ## Security
 
@@ -360,7 +437,7 @@ Pages):
 ```bash
 npm ci
 npm run dev        # vite dev server
-npm test           # full suite (52 tests)
+npm test           # full suite (87 tests)
 npm run test:watch # red-green loop, the way this repo was built
 npm run typecheck
 npm run lint
