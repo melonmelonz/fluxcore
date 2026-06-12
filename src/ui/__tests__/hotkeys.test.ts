@@ -11,6 +11,14 @@ describe('hotkeyAction', () => {
     expect(hotkeyAction(ev('2'))).toEqual({ type: 'speed', speed: 6 });
     expect(hotkeyAction(ev('3'))).toEqual({ type: 'speed', speed: 24 });
   });
+  it('maps arrow keys to single-tick steps', () => {
+    expect(hotkeyAction(ev('ArrowRight'))).toEqual({ type: 'step', dir: 1 });
+    expect(hotkeyAction(ev('ArrowLeft'))).toEqual({ type: 'step', dir: -1 });
+  });
+  it('ignores arrows typed into form controls', () => {
+    expect(hotkeyAction(ev('ArrowRight', 'SELECT'))).toBeNull();
+    expect(hotkeyAction(ev('ArrowLeft', 'INPUT'))).toBeNull();
+  });
   it('ignores other keys', () => {
     expect(hotkeyAction(ev('4'))).toBeNull();
     expect(hotkeyAction(ev('Enter'))).toBeNull();

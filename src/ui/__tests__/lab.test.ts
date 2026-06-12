@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { monthsInRange, rangeMs } from '../lab/range';
+import { MAX_LAB_DAYS, monthsInRange, rangeDays, rangeMs } from '../lab/range';
 import { decodeLab, encodeLab } from '../lab/share';
 
 describe('monthsInRange', () => {
@@ -17,6 +17,16 @@ describe('rangeMs', () => {
     const { lo, hi } = rangeMs('2023-08-14', '2023-08-21');
     expect(lo).toBe(Date.UTC(2023, 7, 14, 6));
     expect(hi).toBe(Date.UTC(2023, 7, 21, 6));
+  });
+});
+
+describe('rangeDays / MAX_LAB_DAYS', () => {
+  it('measures whole days between Central midnights', () => {
+    expect(rangeDays('2023-08-14', '2023-08-21')).toBe(7);
+  });
+  it('a quarter fits, a half-year does not', () => {
+    expect(rangeDays('2023-06-01', '2023-09-01')).toBeLessThanOrEqual(MAX_LAB_DAYS);
+    expect(rangeDays('2023-01-01', '2023-07-01')).toBeGreaterThan(MAX_LAB_DAYS);
   });
 });
 

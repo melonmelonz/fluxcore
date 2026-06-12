@@ -6,7 +6,7 @@ import { seasonForMonth } from '../../core/solar';
 import { ThresholdStrategy } from '../../core/threshold';
 import type { PricePoint, Scenario } from '../../core/types';
 import { type FleetMix, fleetFromMix, mixTotals } from '../../core/units';
-import { monthsInRange, rangeMs } from './range';
+import { MAX_LAB_DAYS, monthsInRange, rangeDays, rangeMs } from './range';
 import type { LabParams } from './share';
 
 export interface ArchiveIndex { hubs: string[]; months: string[] }
@@ -54,6 +54,9 @@ export function useLab() {
     setRun(null);
     setProgress(0);
     try {
+      if (rangeDays(params.start, params.end) > MAX_LAB_DAYS) {
+        throw new Error(`range too long - max ${MAX_LAB_DAYS} days per run`);
+      }
       const { rtm, dam } = await loadRange(params);
       if (rtm.length === 0) throw new Error('no data in that window');
       const season = seasonForMonth(Number(params.start.slice(5, 7)));

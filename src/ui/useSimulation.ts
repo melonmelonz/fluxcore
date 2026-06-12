@@ -66,5 +66,29 @@ export function useSimulation(scenario: Scenario | null, mix: FleetMix) {
     setEpoch((e) => e + 1);
   };
 
-  return { snap, playing, setPlaying, speed, setSpeed, reset, epoch, exportEntries: () => ctl?.ledgers().flatMap((g) => g.entries).sort((a, b) => a.t - b.t) ?? [] };
+  /** Single-tick scrub. Forward advances the live controller; backward replays a
+   *  fresh controller to tick N-1 (deterministic core makes this exact) and bumps
+   *  the epoch so the chart re-seeds instead of receiving an out-of-order update.
+   *  The current tick index is derived from the snapshot's position in the price
+   *  series, so no extra counter state is needed. */
+  const step = (dir: 1 | -1) => {
+    if (!scenario || !ctl) return;
+    setPlaying(false);
+    if (dir === 1) {
+      const s = ctl.tick();
+      if (s) setSnap(s);
+      return;
+    }
+    const count = snap ? scenario.rtm.findIndex((p) => p.t === snap.t) + 1 : 0;
+    const target = count - 1;
+    if (target < 0) return;
+    const fresh = makeController(scenario, mix);
+    let s: SimSnapshot | null = null;
+    for (let i = 0; i < target; i++) s = fresh.tick();
+    setCtl(fresh);
+    setSnap(s);
+    setEpoch((e) => e + 1);
+  };
+
+  return { snap, playing, setPlaying, speed, setSpeed, reset, step, epoch, exportEntries: () => ctl?.ledgers().flatMap((g) => g.entries).sort((a, b) => a.t - b.t) ?? [] };
 }

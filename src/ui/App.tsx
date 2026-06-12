@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { parseScenario } from '../core/scenario';
 import type { Scenario } from '../core/types';
 import type { FleetMix } from '../core/units';
@@ -55,13 +55,16 @@ export default function App() {
 
   const deskActive = view === 'desk' && !isLive;
   const { setPlaying, setSpeed } = sim;
+  const stepRef = useRef(sim.step);
+  useEffect(() => { stepRef.current = sim.step; }); // step closes over the controller; ref keeps the listener stable
   useEffect(() => {
     if (!deskActive) return;
     const onKey = (e: KeyboardEvent) => {
       const action = hotkeyAction(e);
       if (!action) return;
-      e.preventDefault(); // space must not scroll the page
+      e.preventDefault(); // space must not scroll the page, arrows must not scrub selects
       if (action.type === 'toggle') setPlaying((p) => !p);
+      else if (action.type === 'step') stepRef.current(action.dir);
       else setSpeed(action.speed);
     };
     window.addEventListener('keydown', onKey);
@@ -94,6 +97,7 @@ export default function App() {
             onPlay={() => sim.setPlaying(!sim.playing)}
             speed={sim.speed}
             onSpeed={sim.setSpeed}
+            onStep={sim.step}
             onReset={sim.reset}
             live={isLive}
           />
@@ -102,7 +106,15 @@ export default function App() {
         <>
           <div className="card span-2">
             <h2>{scenario?.name ?? 'loading'} - ERCOT HB_NORTH - $/MWh{' '}<StormBadge storm={storm} /></h2>
-            <PriceChart snap={sim.snap} epoch={sim.epoch} storm={storm} />
+            <PriceChart
+              snap={sim.snap}
+              epoch={sim.epoch}
+              storm={storm}
+              seed={() => ({
+                points: scenario && sim.snap ? scenario.rtm.filter((p) => p.t <= sim.snap!.t) : [],
+                entries: sim.exportEntries().filter((e) => e.strategy === 'lp-optimizer'),
+              })}
+            />
           </div>
           <ControlBar
             scenarios={[LIVE_ENTRY, ...index]}
@@ -112,6 +124,7 @@ export default function App() {
             onPlay={() => sim.setPlaying(!sim.playing)}
             speed={sim.speed}
             onSpeed={sim.setSpeed}
+            onStep={sim.step}
             onReset={sim.reset}
             live={isLive}
           />

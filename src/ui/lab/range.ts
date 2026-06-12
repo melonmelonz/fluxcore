@@ -12,6 +12,16 @@ export function monthsInRange(startISO: string, endISO: string): string[] {
   return out;
 }
 
+/** Longest runnable window. The oracle LP is synchronous; beyond ~a quarter it
+ *  would lock the tab (and share links auto-run, so this must be enforced, not
+ *  just suggested by the form). */
+export const MAX_LAB_DAYS = 92;
+
+export function rangeDays(startISO: string, endISO: string): number {
+  const { lo, hi } = rangeMs(startISO, endISO);
+  return (hi - lo) / 86_400_000;
+}
+
 /** [lo, hi) epoch-ms window: Central midnight of start to Central midnight of end. */
 export function rangeMs(startISO: string, endISO: string): { lo: number; hi: number } {
   const ms = (iso: string) => {

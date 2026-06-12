@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { FleetMix } from '../../core/units';
 import FleetDesigner from '../components/FleetDesigner';
 import { download, labRunCSV } from '../export';
+import { MAX_LAB_DAYS, rangeDays } from './range';
 import { encodeLab, type LabParams } from './share';
 import StressCard from './StressCard';
 import { useLab } from './useLab';
@@ -41,12 +42,15 @@ export default function LabView({ initial, mix, onMix }: { initial: LabParams | 
             onChange={(e) => setStart(e.target.value)} />
           <input aria-label="end" type="date" value={end} min={min} max={max}
             onChange={(e) => setEnd(e.target.value)} />
-          <button className="primary" disabled={lab.running || start >= end}
+          <button className="primary" disabled={lab.running || start >= end || rangeDays(start, end) > MAX_LAB_DAYS}
             onClick={() => { window.location.hash = encodeLab(params); lab.start(params, mix); }}>
             {lab.running ? `Running ${Math.round(lab.progress * 100)}%` : 'Run backtest'}
           </button>
         </div>
         {lab.running && <div className="lab-progress"><div style={{ width: `${lab.progress * 100}%` }} /></div>}
+        {!lab.running && rangeDays(start, end) > MAX_LAB_DAYS && (
+          <p className="lab-error">max {MAX_LAB_DAYS} days per run — tighten the window</p>
+        )}
         {lab.error && <p className="lab-error">{lab.error}</p>}
       </div>
       {lab.run && (
