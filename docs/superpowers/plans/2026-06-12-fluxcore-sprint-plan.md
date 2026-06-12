@@ -181,8 +181,27 @@ Designed in `docs/superpowers/specs` + planned in `docs/superpowers/plans` (2026
 1. **RTM ingestion via `systemWidePrices.json`** — parser (TDD), fallback chain `dashboard -> MIS -> fail closed`, backfills the whole current day per fetch. Unblocks true 15-min live trading.
 2. CI worker deploy — needs `Workers Scripts:Edit` + `KV:Edit` + `D1:Edit` on the CI token (manual `npm run deploy:worker` meanwhile).
 3. Plan C — strategy workshop (parameterized strategies, saved configs, leaderboard).
-4. Plan D — fleet designer.
-5. Render TDD logs 24-28 to PNGs for the README (raw logs linked meanwhile).
+4. Render TDD logs 24-28 to PNGs for the README (raw logs linked meanwhile).
+
+(Plan D — fleet designer — was delivered by Diana in PR #5; removed from the backlog.)
+
+---
+
+## Roadmap — Michael's Feature Track
+
+Ideas contributed by Michael (CEO, @windwardline) at sprint close, 2026-06-12.
+
+**Larger features**
+
+1. **Accounts + saved backtests** — lightweight auth to save, name, and reload runs. Parameters already live in the share URL; persist and list them per user. Constraint: must not weaken the strict CSP.
+2. **PWA + mobile polish** — installable, offline-capable build with cached archive chunks; control-bar pass so the Lab is fully thumb-reachable. Coordinate with Diana's inline control bar (PR #7).
+
+**Smaller features**
+
+3. **Light/dark theme toggle** wired to the existing design tokens.
+4. **Accessibility pass to WCAG AA** — focus order, ARIA on chart + dispatch log, contrast audit. Pairs with Diana's StormBadge a11y (PR #2).
+5. **Arrow-key single-tick stepping** — left/right arrows step the active run one tick back/forward (Penn's scoping: arrows are the only new keys needed; extends Diana's hotkeys, PR #7).
+6. **Loading skeletons + error boundary** for the Live and Lab fetches.
 
 ---
 
