@@ -10,6 +10,7 @@ import PnlStrip from './components/PnlStrip';
 import WearPanel from './components/WearPanel';
 import PriceChart from './components/PriceChart';
 import StormBadge from './components/StormBadge';
+import ThemeToggle from './components/ThemeToggle';
 import { download, ledgerCSV } from './export';
 import LabView from './lab/LabView';
 import { decodeLab } from './lab/share';
@@ -19,6 +20,7 @@ import { isStorm } from './storm';
 import { useLiveDesk } from './useLiveDesk';
 import { hotkeyAction } from './hotkeys';
 import { useSimulation } from './useSimulation';
+import { useTheme } from './useTheme';
 
 interface IndexEntry { id: string; name: string }
 
@@ -32,6 +34,7 @@ export default function App() {
   const [scenario, setScenario] = useState<Scenario | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [mix, setMix] = useState<FleetMix>(loadMix);
+  const { theme, toggle: toggleTheme } = useTheme();
   const isLive = scenarioId === 'live';
   const updateMix = (m: FleetMix) => { setMix(m); saveMix(m); };
   const sim = useSimulation(isLive ? null : scenario, mix);
@@ -81,6 +84,7 @@ export default function App() {
           <button aria-pressed={view === 'desk'} onClick={() => setView('desk')}>Desk</button>
           <button aria-pressed={view === 'lab'} onClick={() => setView('lab')}>Lab</button>
         </nav>
+        <ThemeToggle theme={theme} onToggle={toggleTheme} />
       </header>
       {view === 'lab' ? (
         <LabView initial={initialLab} mix={mix} onMix={updateMix} />

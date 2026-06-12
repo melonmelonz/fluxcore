@@ -13,6 +13,23 @@
   --red: #E0635B;
   --mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   --sans: system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --bg: #F3F6FB;
+  --surface: #FFFFFF;
+  --surface-2: #E8EEF6;
+  --line: #D3DEEB;
+  --text: #15212F;
+  --dim: #5B6B80;
+  --blue: #1B66C9;
+  --blue-soft: #DCEAFB;
+  --cyan: #0B7DA6;
+  --orange: #B5650A;
+  --green: #1E8E5E;
+  --red: #C0392B;
+  color-scheme: light;
 }
 
 * { box-sizing: border-box; }
@@ -142,6 +159,19 @@ header.brand span { color: var(--dim); font-size: 12px; }
 }
 .tabs button[aria-pressed='true'] { background: var(--blue-soft); border-color: var(--blue); }
 
+.theme-toggle {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
 .lab-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .lab-form select,
 .lab-form input,
@@ -153,7 +183,6 @@ header.brand span { color: var(--dim); font-size: 12px; }
   padding: 8px 12px;
   font-size: 13px;
   font-family: var(--sans);
-  color-scheme: dark;
 }
 .lab-form button.primary { background: var(--blue-soft); border-color: var(--blue); cursor: pointer; }
 .lab-form button:disabled { opacity: 0.5; cursor: default; }
