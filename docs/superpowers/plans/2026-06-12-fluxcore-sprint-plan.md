@@ -198,9 +198,9 @@ Ideas contributed by Michael (CEO, @windwardline) at sprint close, 2026-06-12.
 
 **Smaller features**
 
-3. **Light/dark theme toggle** wired to the existing design tokens.
+3. **Light/dark theme toggle** wired to the existing design tokens. (SHIPPED 2026-06-12 — header toggle, persisted in localStorage, charts re-palette via rebuild + reseed.)
 4. **Accessibility pass to WCAG AA** — focus order, ARIA on chart + dispatch log, contrast audit. Pairs with Diana's StormBadge a11y (PR #2).
-5. **Arrow-key single-tick stepping** — left/right arrows step the active run one tick back/forward (Penn's scoping: arrows are the only new keys needed; extends Diana's hotkeys, PR #7).
+5. **Arrow-key single-tick stepping** — left/right arrows step the active run one tick back/forward (Penn's scoping: arrows are the only new keys needed; extends Diana's hotkeys, PR #7). (SHIPPED 2026-06-12.)
 6. **Loading skeletons + error boundary** for the Live and Lab fetches.
 
 ---

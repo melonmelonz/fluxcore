@@ -16,6 +16,7 @@ import { decodeLab } from './lab/share';
 import { LiveView } from './LiveView';
 import { loadMix, saveMix } from './mixStorage';
 import { isStorm } from './storm';
+import { applyTheme, loadTheme, saveTheme, type Theme } from './theme';
 import { useLiveDesk } from './useLiveDesk';
 import { hotkeyAction } from './hotkeys';
 import { useSimulation } from './useSimulation';
@@ -32,6 +33,8 @@ export default function App() {
   const [scenario, setScenario] = useState<Scenario | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [mix, setMix] = useState<FleetMix>(loadMix);
+  const [theme, setTheme] = useState<Theme>(loadTheme);
+  useEffect(() => { applyTheme(theme); saveTheme(theme); }, [theme]);
   const isLive = scenarioId === 'live';
   const updateMix = (m: FleetMix) => { setMix(m); saveMix(m); };
   const sim = useSimulation(isLive ? null : scenario, mix);
@@ -83,12 +86,20 @@ export default function App() {
         <nav className="tabs">
           <button aria-pressed={view === 'desk'} onClick={() => setView('desk')}>Desk</button>
           <button aria-pressed={view === 'lab'} onClick={() => setView('lab')}>Lab</button>
+          <button
+            className="theme-toggle"
+            aria-label={theme === 'dark' ? 'switch to light mode' : 'switch to dark mode'}
+            title={theme === 'dark' ? 'light mode' : 'dark mode'}
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          >
+            {theme === 'dark' ? '\u2600' : '\u263E'}
+          </button>
         </nav>
       </header>
       {view === 'lab' ? (
         <LabView initial={initialLab} mix={mix} onMix={updateMix} />
       ) : isLive ? (
-        <LiveView live={live} controls={
+        <LiveView live={live} theme={theme} controls={
           <ControlBar
             scenarios={[LIVE_ENTRY, ...index]}
             scenarioId={scenarioId}
@@ -110,6 +121,7 @@ export default function App() {
               snap={sim.snap}
               epoch={sim.epoch}
               storm={storm}
+              theme={theme}
               seed={() => ({
                 points: scenario && sim.snap ? scenario.rtm.filter((p) => p.t <= sim.snap!.t) : [],
                 entries: sim.exportEntries().filter((e) => e.strategy === 'lp-optimizer'),

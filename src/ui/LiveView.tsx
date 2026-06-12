@@ -7,6 +7,7 @@ import FleetPanel from './components/FleetPanel';
 import PnlStrip from './components/PnlStrip';
 import StormBadge from './components/StormBadge';
 import { isStorm } from './storm';
+import { chartPalette, type Theme } from './theme';
 import type { LiveState } from './useLiveDesk';
 
 const STALE_MS = 20 * 60_000;
@@ -30,19 +31,20 @@ export function LiveBadge({ lastUpdated }: { lastUpdated: number | null }) {
   return <span className="live-badge on">LIVE</span>;
 }
 
-function LiveChart({ points, storm }: { points: { t: number; price: number }[]; storm: boolean }) {
+function LiveChart({ points, storm, theme }: { points: { t: number; price: number }[]; storm: boolean; theme: Theme }) {
   const host = useRef<HTMLDivElement>(null);
   const chart = useRef<IChartApi | null>(null);
   const series = useRef<ISeriesApi<'Area'> | null>(null);
 
   useEffect(() => {
     if (!host.current) return;
+    const pal = chartPalette[theme];
     const c = createChart(host.current, {
       autoSize: true,
-      layout: { background: { color: 'transparent' }, textColor: '#7E93AC', fontSize: 11 },
-      grid: { vertLines: { color: '#16263B' }, horzLines: { color: '#16263B' } },
-      rightPriceScale: { borderColor: '#243A55' },
-      timeScale: { borderColor: '#243A55', timeVisible: true, secondsVisible: false },
+      layout: { background: { color: 'transparent' }, textColor: pal.text, fontSize: 11 },
+      grid: { vertLines: { color: pal.grid }, horzLines: { color: pal.grid } },
+      rightPriceScale: { borderColor: pal.border },
+      timeScale: { borderColor: pal.border, timeVisible: true, secondsVisible: false },
     });
     series.current = c.addAreaSeries({
       lineColor: '#2E86E0',
@@ -53,19 +55,20 @@ function LiveChart({ points, storm }: { points: { t: number; price: number }[]; 
     });
     chart.current = c;
     return () => { c.remove(); chart.current = null; series.current = null; };
-  }, []);
+  }, [theme]);
 
   useEffect(() => {
     series.current?.applyOptions(storm
       ? { lineColor: '#F5A623', topColor: 'rgba(245, 166, 35, 0.28)', bottomColor: 'rgba(245, 166, 35, 0.02)' }
       : { lineColor: '#2E86E0', topColor: 'rgba(46, 134, 224, 0.28)', bottomColor: 'rgba(46, 134, 224, 0.02)' });
-  }, [storm]);
+  }, [storm, theme]);
 
   useEffect(() => {
     if (!series.current) return;
     series.current.setData(points.map((p) => ({ time: (p.t / 1000) as UTCTimestamp, value: p.price })));
     chart.current?.timeScale().fitContent();
-  }, [points]);
+  // theme in deps: data must be re-fed after the chart rebuilds for a theme switch
+  }, [points, theme]);
 
   return <div className="chart-host" ref={host} />;
 }
@@ -99,7 +102,7 @@ function toSnapshot(live: LiveState): SimSnapshot | null {
   };
 }
 
-export function LiveView({ live, controls }: { live: LiveState | null; controls?: ReactNode }) {
+export function LiveView({ live, controls, theme = 'dark' }: { live: LiveState | null; controls?: ReactNode; theme?: Theme }) {
   const snap = live ? toSnapshot(live) : null;
   const storm = isStorm(live?.rtm.at(-1)?.price ?? null);
   return (
@@ -109,7 +112,7 @@ export function LiveView({ live, controls }: { live: LiveState | null; controls?
           Live — ERCOT HB_NORTH — $/MWh <LiveBadge lastUpdated={live?.lastUpdated ?? null} />
           {' '}<StormBadge storm={storm} />
         </h2>
-        <LiveChart points={live?.rtm ?? []} storm={storm} />
+        <LiveChart points={live?.rtm ?? []} storm={storm} theme={theme} />
       </div>
       {controls}
       <PnlStrip snap={snap} />

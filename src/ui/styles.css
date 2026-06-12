@@ -13,6 +13,23 @@
   --red: #E0635B;
   --mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   --sans: system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --bg: #EDF2F8;
+  --surface: #FFFFFF;
+  --surface-2: #E2EAF4;
+  --line: #C2D2E4;
+  --text: #1A2A3C;
+  --dim: #5B7188;
+  --blue: #2470C2;
+  --blue-soft: #CFE2F6;
+  --cyan: #0B7DBE;
+  --orange: #B96E08;
+  --green: #157A55;
+  --red: #C0473F;
+  color-scheme: light;
 }
 
 * { box-sizing: border-box; }
@@ -314,3 +331,28 @@ kbd {
 
 .hotkey-hint { color: var(--dim); font-size: 11px; margin-left: 8px; display: none; }
 @media (min-width: 900px) { .hotkey-hint { display: inline; } }
+
+/* light theme: a few rules above hardcode dark-tuned colors; retune them here */
+[data-theme='light'] .controls .ctl:hover { color: var(--text); }
+[data-theme='light'] .controls .play {
+  background: linear-gradient(135deg, #3B82D8, #2470C2);
+  color: #fff;
+}
+[data-theme='light'] .controls .play.on,
+[data-theme='light'] .controls .seg button.active,
+[data-theme='light'] .controls .seg button[aria-pressed='true'] { color: #fff; }
+[data-theme='light'] .controls .seg button:hover { background: rgba(36, 112, 194, 0.12); }
+[data-theme='light'] .tip::after {
+  background: #1A2A3C;
+  border-color: #1A2A3C;
+  color: #F2F7FC;
+  box-shadow: 0 8px 20px rgba(26, 42, 60, 0.25);
+}
+[data-theme='light'] .lab-form select,
+[data-theme='light'] .lab-form input,
+[data-theme='light'] .lab-form button { color-scheme: light; }
+[data-theme='light'] .live-badge.on,
+[data-theme='light'] .live-badge.stale,
+[data-theme='light'] .live-badge.storm-on { color: #fff; }
+
+.tabs .theme-toggle { padding: 5px 10px; min-width: 34px; }
