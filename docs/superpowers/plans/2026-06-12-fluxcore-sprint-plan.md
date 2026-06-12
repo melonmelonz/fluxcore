@@ -118,15 +118,32 @@ Every price point that ever reaches the worker is `INSERT OR REPLACE`d into D1. 
 
 **Canonical demo URL: `https://fluxcore.solutions`**
 
+### Epic 8 — Diana's Feature Set (Day 2 -> Demo day, parallel track) — DONE
+
+Designed in `docs/superpowers/specs` + planned in `docs/superpowers/plans` (2026-06-11 Diana set), delivered as 9 reviewed PRs (#1-#9), ~2,850 lines.
+
+| # | Story | PR |
+|---|-------|----|
+| 8.1 | Brand assets: new logo crop, emblem-only vector favicon, header lockup | #1, #8, #9 |
+| 8.2 | Storm mode: spike detection helper + spike-triggered UI shift with a11y badge | #2 |
+| 8.3 | Battery wear dashboard: cycles, throughput totals, degradation dollars | #3 |
+| 8.4 | One-click CSV/JSON export for dispatch log and lab runs | #4 |
+| 8.5 | Fleet designer (was Plan D): unit catalog, presets, validated mix storage, capacity-weighted view, wired through replay desk AND backtest lab | #5 |
+| 8.6 | Monte Carlo stress card: seeded PRNG, forecast noise model, steppable runner, streaming histogram | #6 |
+| 8.7 | Keyboard shortcuts: space play/pause, 1/2/3 speed; control bar moved inline | #7 |
+
+**Integration (merge day):** docs-only rebase, zero conflicts — the shared `deskTick`/lane architecture absorbed a fleet-mix dimension without touching core physics. One environment fix followed (`src/test/setup.ts`): Node >= 25's stub `localStorage` shadows jsdom's under vitest 4; an in-memory polyfill keeps the suite green on every machine and in CI.
+
 ---
 
 ## Sprint Metrics
 
 | Metric | Value |
 |---|---|
-| Test suite | **96 tests, 19 files, all green** |
+| Test suite | **136 tests, 28 files, all green** |
 | TDD discipline | **20 red/green log pairs** (`docs/tdd/logs/02-28`), every core module test-first |
-| Commits on main | 40+ — small, single-purpose, conventional |
+| Team throughput | 9 partner PRs reviewed + merged on demo eve; docs-only rebase, zero conflicts |
+| Commits on main | 70+ — small, single-purpose, conventional |
 | Deploys | Pages (app + Functions), Worker (cron + DO), D1, KV — all live |
 | Historical data | 96 monthly chunks - 4 hubs - 2 years (~12 MB), growing every 15 min |
 | Headline numbers | Threshold $22.1k - LP $17.5k - Oracle $25.7k (heatwave week) |
